@@ -8,48 +8,56 @@
 </head>
 <body>
   <h1>Class Vote</h1>
-  <div id="buttons"></div>
+
+  <input id="name" placeholder="Your name" maxlength="40">
+  <input id="secs" type="number" min="0" placeholder="Guess (seconds)">
+  <button id="send">Submit</button>
   <p id="msg"></p>
+
   <h2>Results</h2>
+  <p id="stats"></p>
   <ul id="results"></ul>
 
   <script>
     const db = supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
-    const options = ["Option A", "Option B", "Option C"];
+    const TABLE = "guesses"; // change to your table name
 
-    const buttons = document.getElementById("buttons");
-    options.forEach(o => {
-      const b = document.createElement("button");
-      b.textContent = o;
-      b.onclick = () => vote(o);
-      buttons.appendChild(b);
-    });
+    document.getElementById("send").onclick = async () => {
+      const voter_name = document.getElementById("name").value.trim();
+      const guess_seconds = parseInt(document.getElementById("secs").value, 10);
+      const msg = document.getElementById("msg");
 
-    async function vote(choice) {
+      if (!voter_name || isNaN(guess_seconds)) {
+        msg.textContent = "Please enter a name and a number.";
+        return;
+      }
       if (localStorage.getItem("voted")) {
         msg.textContent = "You already voted on this device.";
         return;
       }
-      const { error } = await db.from("votes").insert({ choice });
+      const { error } = await db.from(TABLE).insert({ voter_name, guess_seconds });
       if (error) { msg.textContent = "Error: " + error.message; return; }
       localStorage.setItem("voted", "1");
       msg.textContent = "Thanks for voting!";
       loadResults();
-    }
+    };
 
     async function loadResults() {
-      const { data, error } = await db.rpc("get_results");
+      const { data, error } = await db.from(TABLE).select("voter_name, guess_seconds").order("guess_seconds");
       if (error) return;
-      results.innerHTML = "";
+      const list = document.getElementById("results");
+      list.innerHTML = "";
       data.forEach(r => {
         const li = document.createElement("li");
-        li.textContent = `${r.choice}: ${r.total}`;
-        results.appendChild(li);
+        li.textContent = `${r.voter_name}: ${r.guess_seconds} s`;
+        list.appendChild(li);
       });
+      const avg = data.length ? Math.round(data.reduce((s, r) => s + r.guess_seconds, 0) / data.length) : 0;
+      document.getElementById("stats").textContent = `${data.length} guesses, average ${avg} s`;
     }
 
     loadResults();
-    setInterval(loadResults, 5000); // refresh every 5 seconds
+    setInterval(loadResults, 5000);
   </script>
 </body>
 </html>
