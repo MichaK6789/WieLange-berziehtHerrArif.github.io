@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <style>
-  .nav { position: fixed; top: 10px; right: 15px; }
-  .nav a { margin-left: 12px; }
-  </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Class Vote</title>
+  <style>
+    .nav { position: fixed; top: 10px; right: 15px; }
+    .nav a { margin-left: 12px; }
+    #winner { font-weight: bold; }
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -19,13 +20,16 @@
   <button id="send">Submit</button>
   <p id="msg"></p>
 
+  <h2 id="winnerTitle" hidden>Winner</h2>
+  <p id="winner"></p>
+
   <h2>Results</h2>
   <p id="stats"></p>
   <ul id="results"></ul>
 
   <script>
     const db = supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
-    const TABLE = "guesses"; // change to your table name
+    const TABLE = "guesses";
 
     document.getElementById("send").onclick = async () => {
       const voter_name = document.getElementById("name").value.trim();
@@ -48,17 +52,39 @@
     };
 
     async function loadResults() {
-      const { data, error } = await db.from(TABLE).select("voter_name, guess_seconds").order("guess_seconds");
-      if (error) return;
+      const msg = document.getElementById("msg");
+      const [g, r] = await Promise.all([
+        db.from(TABLE).select("voter_name, guess_seconds").order("guess_seconds"),
+        db.from("game_result").select("actual_seconds").maybeSingle()
+      ]);
+      if (g.error) { msg.textContent = "Load error: " + g.error.message; return; }
+      const data = g.data;
+      const actual = r.data ? r.data.actual_seconds : null;
+
       const list = document.getElementById("results");
       list.innerHTML = "";
-      data.forEach(r => {
+      data.forEach(x => {
         const li = document.createElement("li");
-        li.textContent = `${r.voter_name}: ${r.guess_seconds} s`;
+        li.textContent = `${x.voter_name}: ${x.guess_seconds} s`;
         list.appendChild(li);
       });
-      const avg = data.length ? Math.round(data.reduce((s, r) => s + r.guess_seconds, 0) / data.length) : 0;
+      const avg = data.length ? Math.round(data.reduce((s, x) => s + x.guess_seconds, 0) / data.length) : 0;
       document.getElementById("stats").textContent = `${data.length} guesses, average ${avg} s`;
+
+      const title = document.getElementById("winnerTitle");
+      const winner = document.getElementById("winner");
+      if (actual === null || !data.length) {
+        title.hidden = true;
+        winner.textContent = "";
+        return;
+      }
+      const best = Math.min(...data.map(x => Math.abs(x.guess_seconds - actual)));
+      const winners = data.filter(x => Math.abs(x.guess_seconds - actual) === best);
+      title.hidden = false;
+      winner.textContent =
+        `Real time: ${actual} s. ` +
+        (winners.length > 1 ? "Winners (tie): " : "Winner: ") +
+        winners.map(x => `${x.voter_name} (${x.guess_seconds} s, off by ${best} s)`).join(", ");
     }
 
     loadResults();
