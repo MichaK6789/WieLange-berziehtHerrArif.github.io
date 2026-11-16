@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin</title>
-  <style>
-    .nav { position: fixed; top: 10px; right: 15px; }
-    .nav a { margin-left: 12px; }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 760px; margin: 0 auto; padding: 60px 18px 80px; line-height: 1.5; }
+  .nav { position: fixed; top: 10px; right: 15px; }
+  .nav a { margin-left: 12px; }
+  h2 { margin-top: 36px; }
+  input, button { padding: 8px 12px; font-size: 1rem; margin: 3px 3px 3px 0; }
+  li { margin: 8px 0; }
+  #msg { font-weight: bold; min-height: 1.4em; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
 </head>
 <body>
   <div class="nav"><a href="index.html">Vote</a></div>
@@ -16,16 +21,26 @@
 
   <input id="user" placeholder="Name" autocomplete="username">
   <input id="pass" type="password" placeholder="Password" autocomplete="current-password">
+  <p id="msg"></p>
 
   <h2>Declare winner</h2>
   <input id="actual" type="number" min="0" placeholder="Real time (seconds)">
   <button id="setResult">Set time &amp; declare winner</button>
-  <button id="removeResult">Remove result / reopen voting</button>
+  <button id="removeResult">Reopen voting (clears votes, keeps leaderboard)</button>
 
   <h2>Reset</h2>
   <button id="clear">Clear all votes</button>
+  <button id="clearBoard">Clear leaderboard</button>
 
-  <p id="msg"></p>
+  <h2>Total time (rounds)</h2>
+  <p id="total"></p>
+  <input id="newRound" type="number" min="0" placeholder="Seconds">
+  <button id="addRound">Add round</button>
+  <ul id="rounds"></ul>
+
+  <h2>Support tickets</h2>
+  <button id="loadTickets">Load tickets</button>
+  <ul id="tickets"></ul>
 
   <script>
     const db = supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
@@ -35,16 +50,19 @@
       p_pass: document.getElementById("pass").value
     });
 
+    // ---- Winner / reset ----
     document.getElementById("setResult").onclick = async () => {
       const secs = parseInt(document.getElementById("actual").value, 10);
       if (isNaN(secs) || secs < 0) { msg.textContent = "Enter the real time in seconds."; return; }
       const { error } = await db.rpc("set_result", { ...creds(), p_seconds: secs });
       msg.textContent = error ? "Error: " + error.message : "Time set to " + secs + " s. Winner is now shown on the main page.";
+      loadRounds();
     };
 
     document.getElementById("removeResult").onclick = async () => {
+      if (!confirm("Delete all votes and reopen voting? The leaderboard is kept.")) return;
       const { error } = await db.rpc("set_result", { ...creds(), p_seconds: null });
-      msg.textContent = error ? "Error: " + error.message : "Result removed. Voting is open again.";
+      msg.textContent = error ? "Error: " + error.message : "Votes cleared. Voting is open again.";
     };
 
     document.getElementById("clear").onclick = async () => {
@@ -52,6 +70,81 @@
       const { error } = await db.rpc("clear_guesses", creds());
       msg.textContent = error ? "Error: " + error.message : "All votes and the result were deleted.";
     };
+
+    document.getElementById("clearBoard").onclick = async () => {
+      if (!confirm("Delete the whole leaderboard? This cannot be undone.")) return;
+      const { error } = await db.rpc("clear_leaderboard", creds());
+      msg.textContent = error ? "Error: " + error.message : "Leaderboard cleared.";
+    };
+
+    // ---- Rounds (editable total) ----
+    async function loadRounds() {
+      const { data, error } = await db.from("rounds").select("id, seconds, created_at").order("created_at");
+      if (error) return;
+      const list = document.getElementById("rounds");
+      list.innerHTML = "";
+      let sum = 0;
+      data.forEach(r => {
+        sum += r.seconds;
+        const li = document.createElement("li");
+        li.append(new Date(r.created_at).toLocaleDateString("de-DE") + " ");
+        const inp = document.createElement("input");
+        inp.type = "number"; inp.min = 0; inp.value = r.seconds;
+        const save = document.createElement("button");
+        save.textContent = "Save";
+        save.onclick = async () => {
+          const { error } = await db.rpc("update_round", { ...creds(), p_id: r.id, p_seconds: parseInt(inp.value, 10) });
+          msg.textContent = error ? "Error: " + error.message : "Round updated.";
+          loadRounds();
+        };
+        const del = document.createElement("button");
+        del.textContent = "Delete";
+        del.onclick = async () => {
+          if (!confirm("Delete this round?")) return;
+          const { error } = await db.rpc("delete_round", { ...creds(), p_id: r.id });
+          msg.textContent = error ? "Error: " + error.message : "Round deleted.";
+          loadRounds();
+        };
+        li.append(inp, save, del);
+        list.appendChild(li);
+      });
+      document.getElementById("total").textContent = `Total: ${sum} s (${data.length} rounds)`;
+    }
+
+    document.getElementById("addRound").onclick = async () => {
+      const secs = parseInt(document.getElementById("newRound").value, 10);
+      if (isNaN(secs) || secs < 0) { msg.textContent = "Enter the seconds."; return; }
+      const { error } = await db.rpc("add_round", { ...creds(), p_seconds: secs });
+      msg.textContent = error ? "Error: " + error.message : "Round added.";
+      loadRounds();
+    };
+
+    // ---- Support tickets ----
+    async function loadTickets() {
+      const { data, error } = await db.rpc("admin_list_tickets", creds());
+      const list = document.getElementById("tickets");
+      list.innerHTML = "";
+      if (error) { msg.textContent = "Error: " + error.message; return; }
+      if (!data.length) { list.textContent = "No tickets."; return; }
+      data.forEach(t => {
+        const li = document.createElement("li");
+        li.append(`${t.voter_name} (${new Date(t.created_at).toLocaleString("de-DE")}) – ${t.status} `);
+        if (t.status === "open") {
+          const b = document.createElement("button");
+          b.textContent = "Revalidate device";
+          b.onclick = async () => {
+            const { error } = await db.rpc("approve_ticket", { ...creds(), p_id: t.id });
+            msg.textContent = error ? "Error: " + error.message : "Device unlocked for " + t.voter_name + ".";
+            loadTickets();
+          };
+          li.append(b);
+        }
+        list.appendChild(li);
+      });
+    }
+    document.getElementById("loadTickets").onclick = loadTickets;
+
+    loadRounds();
   </script>
 </body>
 </html>
