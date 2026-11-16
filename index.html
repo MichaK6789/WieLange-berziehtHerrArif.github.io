@@ -19,7 +19,7 @@ nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:grid;gri
 .links{display:flex;gap:26px}
 .links a{color:var(--text);text-decoration:none;font-size:.92rem}
 .links a:hover{opacity:.6}
-.right{justify-self:end;display:flex;gap:8px}
+.right{justify-self:end;display:flex;gap:8px;align-items:center}
 .pill{display:inline-block;padding:8px 16px;border-radius:999px;font-size:.85rem;font-weight:600;text-decoration:none;border:1px solid var(--text);cursor:pointer}
 .admin{padding:8px 12px;color:var(--muted);font-size:.9rem;text-decoration:none;opacity:.7}
 .admin:hover{opacity:1}
@@ -53,6 +53,15 @@ ul,ol{list-style:none;margin:0;padding:0}
 .demo{text-align:center;color:var(--muted);font-size:.85rem;margin:26px 0 0}
 #ergebnisse{position:sticky;top:90px;z-index:1;background:var(--bg)}
 #bestenliste{position:relative;z-index:2;background:var(--card);border-top:none;border-radius:28px 28px 0 0;padding:36px 26px 90px;margin:40px -18px 0;min-height:85vh;box-shadow:0 -14px 40px rgba(0,0,0,.18)}
+.typo{flex:none;padding:8px 12px;background:none;border-radius:0;color:var(--muted);font-size:.9rem;font-weight:400;opacity:.7}
+.typo:hover{opacity:1}
+.modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.45)}
+.modal[hidden]{display:none}
+.sheet{width:100%;max-width:440px;background:var(--card);border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:12px}
+.sheet h2{margin:0;font-size:1.9rem;font-weight:500}
+.sheet p{margin:0}
+.sheet input,.sheet button{flex:none}
+.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
 @media (max-width:700px){.links{display:none}nav{grid-template-columns:1fr auto}.hero{padding:70px 20px 130px}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
@@ -61,7 +70,7 @@ ul,ol{list-style:none;margin:0;padding:0}
 <nav>
 <div class="logo serif">Arif-Tipp</div>
 <div class="links"><a href="#tipp">Tipp abgeben</a><a href="#ergebnisse">Ergebnisse</a><a href="#bestenliste">Bestenliste</a></div>
-<div class="right"><a class="admin" href="admin.html">Admin</a></div>
+<div class="right"><button id="typoBtn" class="typo" hidden>Vertippt?</button><a class="admin" href="admin.html">Admin</a></div>
 </nav>
 
 <section class="hero">
@@ -107,6 +116,17 @@ ul,ol{list-style:none;margin:0;padding:0}
 </section>
 </main>
 
+<div id="modal" class="modal" hidden>
+<div class="sheet">
+<h2 class="serif">Vertippt?</h2>
+<p>Falls du dich vertippt hast, kannst du hier ein Support-Ticket einführen. Ein Moderator kann dieses für dich bestätigen, wenn du ihm Bescheid sagst.</p>
+<input id="ticketName" placeholder="Dein Name (zur Identifikation)" maxlength="40" autocomplete="off">
+<button id="ticketSend">Ticket erstellen</button>
+<button id="ticketClose" class="ghost">Schließen</button>
+<p id="ticketMsg"></p>
+</div>
+</div>
+
 <script>
 const DEMO = false; // true = Vorschau mit Beispieldaten
 const db = DEMO ? null : supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
@@ -124,14 +144,52 @@ document.getElementById("send").onclick = async () => {
   const guess_seconds = parseInt(document.getElementById("secs").value, 10);
   const msg = document.getElementById("msg");
   if (!voter_name || isNaN(guess_seconds)) { msg.textContent = "Bitte gib einen Namen und eine Zahl ein."; return; }
-  if (DEMO) { demo.guesses.push({voter_name, guess_seconds}); msg.textContent = "Danke fürs Abstimmen!"; loadResults(); return; }
+  if (ls.get("voted")) { msg.textContent = "Du hast auf diesem Gerät schon getippt."; updateTypo(); return; }
+  if (DEMO) { demo.guesses.push({voter_name, guess_seconds}); ls.set("voted", "1"); updateTypo(); msg.textContent = "Danke fürs Abstimmen!"; loadResults(); return; }
   const { error } = await db.from(TABLE).insert({ voter_name, guess_seconds });
   if (error) {
     msg.textContent = error.message.includes("row-level security") ? "Die Abstimmung ist geschlossen (ein Ergebnis wurde festgelegt)." : "Fehler: " + error.message;
     return;
   }
+  ls.set("voted", "1");
+  updateTypo();
   msg.textContent = "Danke fürs Abstimmen!";
   loadResults();
+};
+
+const ls = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+function updateTypo() { document.getElementById("typoBtn").hidden = !ls.get("voted"); }
+function releaseDevice() {
+  ls.del("voted"); ls.del("ticketToken"); updateTypo();
+  document.getElementById("msg").textContent = "Dein Ticket wurde bestätigt. Du kannst erneut tippen.";
+}
+async function checkTicket() {
+  const tok = ls.get("ticketToken");
+  if (!tok || DEMO) return;
+  const { data } = await db.rpc("claim_ticket", { p_token: tok });
+  if (data === "approved") releaseDevice();
+}
+const modal = document.getElementById("modal");
+document.getElementById("typoBtn").onclick = () => { modal.hidden = false; };
+document.getElementById("ticketClose").onclick = () => { modal.hidden = true; };
+modal.onclick = e => { if (e.target === modal) modal.hidden = true; };
+document.getElementById("ticketSend").onclick = async () => {
+  const name = document.getElementById("ticketName").value.trim();
+  const tm = document.getElementById("ticketMsg");
+  if (!name) { tm.textContent = "Bitte gib deinen Namen an."; return; }
+  if (ls.get("ticketToken")) { tm.textContent = "Du hast bereits ein Ticket erstellt."; return; }
+  const token = crypto.randomUUID();
+  if (DEMO) setTimeout(releaseDevice, 6000);
+  else {
+    const { error } = await db.rpc("create_ticket", { p_token: token, p_name: name });
+    if (error) { tm.textContent = "Fehler: " + error.message; return; }
+  }
+  ls.set("ticketToken", token);
+  tm.textContent = "Ticket erstellt. Sag einem Moderator Bescheid.";
 };
 
 function fmt(s) {
@@ -215,9 +273,11 @@ function tick() {
 tick();
 setInterval(tick, 1000);
 
+updateTypo();
 loadResults();
 loadLeaderboard();
-setInterval(() => { loadResults(); loadLeaderboard(); }, 5000);
+checkTicket();
+setInterval(() => { loadResults(); loadLeaderboard(); checkTicket(); }, 5000);
 </script>
 </body>
 </html>
