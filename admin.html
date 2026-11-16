@@ -1,33 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <style>
-  .nav { position: fixed; top: 10px; right: 15px; }
-  .nav a { margin-left: 12px; }
-</style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Admin</title>
+  <style>
+    .nav { position: fixed; top: 10px; right: 15px; }
+    .nav a { margin-left: 12px; }
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <div class="nav"><a href="index.html">Vote</a></div>
   <h1>Admin panel</h1>
+
   <input id="user" placeholder="Name" autocomplete="username">
   <input id="pass" type="password" placeholder="Password" autocomplete="current-password">
+
+  <h2>Declare winner</h2>
+  <input id="actual" type="number" min="0" placeholder="Real time (seconds)">
+  <button id="setResult">Set time &amp; declare winner</button>
+  <button id="removeResult">Remove result / reopen voting</button>
+
+  <h2>Reset</h2>
   <button id="clear">Clear all votes</button>
+
   <p id="msg"></p>
-  <div class="nav"><a href="index.html">Vote</a></div>
+
   <script>
     const db = supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
+    const msg = document.getElementById("msg");
+    const creds = () => ({
+      p_user: document.getElementById("user").value,
+      p_pass: document.getElementById("pass").value
+    });
+
+    document.getElementById("setResult").onclick = async () => {
+      const secs = parseInt(document.getElementById("actual").value, 10);
+      if (isNaN(secs) || secs < 0) { msg.textContent = "Enter the real time in seconds."; return; }
+      const { error } = await db.rpc("set_result", { ...creds(), p_seconds: secs });
+      msg.textContent = error ? "Error: " + error.message : "Time set to " + secs + " s. Winner is now shown on the main page.";
+    };
+
+    document.getElementById("removeResult").onclick = async () => {
+      const { error } = await db.rpc("set_result", { ...creds(), p_seconds: null });
+      msg.textContent = error ? "Error: " + error.message : "Result removed. Voting is open again.";
+    };
 
     document.getElementById("clear").onclick = async () => {
-      const msg = document.getElementById("msg");
-      if (!confirm("Really delete ALL votes? This cannot be undone.")) return;
-      const { error } = await db.rpc("clear_guesses", {
-        p_user: document.getElementById("user").value,
-        p_pass: document.getElementById("pass").value
-      });
-      msg.textContent = error ? "Error: " + error.message : "All votes deleted.";
+      if (!confirm("Really delete ALL votes and the result? This cannot be undone.")) return;
+      const { error } = await db.rpc("clear_guesses", creds());
+      msg.textContent = error ? "Error: " + error.message : "All votes and the result were deleted.";
     };
   </script>
 </body>
