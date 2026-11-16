@@ -43,7 +43,7 @@ button:active{transform:scale(.98)}
 #msg{margin:12px 0 0;min-height:1.4em;color:var(--muted)}
 #winnerCard{background:var(--hero);color:#fff;border:none;border-radius:22px;padding:28px;margin:26px 0}
 #winner{margin:0;font-weight:600}
-#stats{margin:0 0 12px;color:var(--muted)}
+#stats,.total{margin:0 0 12px;color:var(--muted)}
 ul,ol{list-style:none;margin:0;padding:0}
 .list{max-height:360px;overflow-y:auto}
 .list li{padding:10px 2px;border-bottom:1px solid var(--line)}
@@ -101,6 +101,7 @@ ul,ol{list-style:none;margin:0;padding:0}
 </section>
 <section class="card" id="bestenliste">
 <h2 class="serif">Bestenliste</h2>
+<p id="total" class="total"></p>
 <ol id="leaderboard" class="list"></ol>
 <p class="demo" id="demoNote" hidden>Vorschau mit Beispieldaten</p>
 </section>
@@ -112,6 +113,7 @@ const db = DEMO ? null : supabase.createClient("https://yxmfpoaujakkixqydgna.sup
 const TABLE = "guesses";
 const demo = {
   actual: 95,
+  rounds: [185, 47, 120],
   guesses: [{voter_name:"Lena",guess_seconds:60},{voter_name:"Kit",guess_seconds:120},{voter_name:"Jonas",guess_seconds:90},{voter_name:"Mira",guess_seconds:300},{voter_name:"Tom",guess_seconds:100}],
   board: [{voter_name:"Sara",guess_seconds:180,actual_seconds:185,diff_seconds:5,submitted_at:"2026-11-09T08:12:00Z"},{voter_name:"Ben",guess_seconds:45,actual_seconds:47,diff_seconds:2,submitted_at:"2026-11-12T08:05:00Z"}]
 };
@@ -132,6 +134,10 @@ document.getElementById("send").onclick = async () => {
   loadResults();
 };
 
+function fmt(s) {
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  return [h ? `${h} Std` : "", (h || m) ? `${m} Min` : "", `${sec} s`].filter(Boolean).join(" ");
+}
 function addItem(list, text, sub) {
   const li = document.createElement("li");
   li.textContent = text;
@@ -184,6 +190,18 @@ async function loadLeaderboard() {
   const list = document.getElementById("leaderboard");
   list.innerHTML = "";
   if (!data.length) addEmpty(list, "Noch keine Gewinner.");
+
+  let secs;
+  if (DEMO) secs = demo.rounds;
+  else {
+    const t = await db.from("rounds").select("seconds");
+    secs = t.error ? [] : t.data.map(x => x.seconds);
+  }
+  const total = secs.reduce((s, v) => s + v, 0);
+  document.getElementById("total").textContent = secs.length
+    ? `Gesamte Überziehzeit: ${fmt(total)} (${secs.length} ${secs.length === 1 ? "Runde" : "Runden"})`
+    : "";
+
   data.forEach(x => addItem(list,
     `${x.voter_name}: Tipp ${x.guess_seconds} s, echte Zeit ${x.actual_seconds} s (${x.diff_seconds} s daneben)`,
     `Abgegeben am ${new Date(x.submitted_at).toLocaleString("de-DE")}`));
