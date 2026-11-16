@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h1>Admin panel</h1>
+  <input id="user" placeholder="Name" autocomplete="username">
+  <input id="pass" type="password" placeholder="Password" autocomplete="current-password">
+  <button id="clear">Clear all votes</button>
+  <p id="msg"></p>
+
+  <script>
+    const db = supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
+
+    document.getElementById("clear").onclick = async () => {
+      const msg = document.getElementById("msg");
+      if (!confirm("Really delete ALL votes? This cannot be undone.")) return;
+      const { error } = await db.rpc("clear_guesses", {
+        p_user: document.getElementById("user").value,
+        p_pass: document.getElementById("pass").value
+      });
+      msg.textContent = error ? "Error: " + error.message : "All votes deleted.";
+    };
+  </script>
+</body>
+</html>
