@@ -1,150 +1,567 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin</title>
+
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 760px; margin: 0 auto; padding: 60px 18px 80px; line-height: 1.5; }
-  .nav { position: fixed; top: 10px; right: 15px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 60px 18px 80px;
+    line-height: 1.5;
+  }
+
+  .nav {
+    position: fixed;
+    top: 10px;
+    right: 15px;
+  }
+
   .nav a { margin-left: 12px; }
+
   h2 { margin-top: 36px; }
-  input, button { padding: 8px 12px; font-size: 1rem; margin: 3px 3px 3px 0; }
+
+  input, button {
+    padding: 8px 12px;
+    font-size: 1rem;
+    margin: 3px 3px 3px 0;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
   li { margin: 8px 0; }
-  #msg { font-weight: bold; min-height: 1.4em; }
+
+  #msg {
+    font-weight: bold;
+    min-height: 1.4em;
+  }
+
+  .delete {
+    background: #b91c1c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+  }
+
+  .refresh {
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
+  }
+
+  .vote-info {
+    display: inline-block;
+    margin-right: 8px;
+  }
+
+  .muted {
+    color: #777;
+    font-size: .85rem;
+  }
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
 </head>
+
 <body>
-  <div class="nav"><a href="index.html">Vote</a></div>
-  <h1>Admin panel</h1>
 
-  <input id="user" placeholder="Name" autocomplete="username">
-  <input id="pass" type="password" placeholder="Password" autocomplete="current-password">
-  <p id="msg"></p>
+<div class="nav">
+  <a href="index.html">Vote</a>
+</div>
 
-  <h2>Declare winner</h2>
-  <input id="actual" type="number" min="0" placeholder="Real time (seconds)">
-  <button id="setResult">Set time &amp; declare winner</button>
-  <button id="removeResult">Reopen voting (clears votes, keeps leaderboard)</button>
+<h1>Admin panel</h1>
 
-  <h2>Reset</h2>
-  <button id="clear">Clear all votes</button>
-  <button id="clearBoard">Clear leaderboard</button>
+<!-- ADMIN LOGIN -->
 
-  <h2>Total time (rounds)</h2>
-  <p id="total"></p>
-  <input id="newRound" type="number" min="0" placeholder="Seconds">
-  <button id="addRound">Add round</button>
-  <ul id="rounds"></ul>
+<input id="user" placeholder="Name" autocomplete="username">
+<input id="pass" type="password" placeholder="Password"
+autocomplete="current-password">
 
-  <h2>Support tickets</h2>
-  <button id="loadTickets">Load tickets</button>
-  <ul id="tickets"></ul>
+<p id="msg"></p>
 
-  <script>
-    const db = supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
-    const msg = document.getElementById("msg");
-    const creds = () => ({
-      p_user: document.getElementById("user").value,
-      p_pass: document.getElementById("pass").value
-    });
 
-    // ---- Winner / reset ----
-    document.getElementById("setResult").onclick = async () => {
-      const secs = parseInt(document.getElementById("actual").value, 10);
-      if (isNaN(secs) || secs < 0) { msg.textContent = "Enter the real time in seconds."; return; }
-      const { error } = await db.rpc("set_result", { ...creds(), p_seconds: secs });
-      msg.textContent = error ? "Error: " + error.message : "Time set to " + secs + " s. Winner is now shown on the main page.";
-      loadRounds();
-    };
+<!-- WINNER -->
 
-    document.getElementById("removeResult").onclick = async () => {
-      if (!confirm("Delete all votes and reopen voting? The leaderboard is kept.")) return;
-      const { error } = await db.rpc("set_result", { ...creds(), p_seconds: null });
-      msg.textContent = error ? "Error: " + error.message : "Votes cleared. Voting is open again.";
-    };
+<h2>Declare winner</h2>
 
-    document.getElementById("clear").onclick = async () => {
-      if (!confirm("Really delete ALL votes and the result? This cannot be undone.")) return;
-      const { error } = await db.rpc("clear_guesses", creds());
-      msg.textContent = error ? "Error: " + error.message : "All votes and the result were deleted.";
-    };
+<input id="actual" type="number" min="0"
+placeholder="Real time (seconds)">
 
-    document.getElementById("clearBoard").onclick = async () => {
-      if (!confirm("Delete the whole leaderboard? This cannot be undone.")) return;
-      const { error } = await db.rpc("clear_leaderboard", creds());
-      msg.textContent = error ? "Error: " + error.message : "Leaderboard cleared.";
-    };
+<button id="setResult">
+  Set time &amp; declare winner
+</button>
 
-    // ---- Rounds (editable total) ----
-    async function loadRounds() {
-      const { data, error } = await db.from("rounds").select("id, seconds, created_at").order("created_at");
-      if (error) return;
-      const list = document.getElementById("rounds");
-      list.innerHTML = "";
-      let sum = 0;
-      data.forEach(r => {
-        sum += r.seconds;
-        const li = document.createElement("li");
-        li.append(new Date(r.created_at).toLocaleDateString("de-DE") + " ");
-        const inp = document.createElement("input");
-        inp.type = "number"; inp.min = 0; inp.value = r.seconds;
-        const save = document.createElement("button");
-        save.textContent = "Save";
-        save.onclick = async () => {
-          const { error } = await db.rpc("update_round", { ...creds(), p_id: r.id, p_seconds: parseInt(inp.value, 10) });
-          msg.textContent = error ? "Error: " + error.message : "Round updated.";
-          loadRounds();
-        };
-        const del = document.createElement("button");
-        del.textContent = "Delete";
-        del.onclick = async () => {
-          if (!confirm("Delete this round?")) return;
-          const { error } = await db.rpc("delete_round", { ...creds(), p_id: r.id });
-          msg.textContent = error ? "Error: " + error.message : "Round deleted.";
-          loadRounds();
-        };
-        li.append(inp, save, del);
-        list.appendChild(li);
-      });
-      document.getElementById("total").textContent = `Total: ${sum} s (${data.length} rounds)`;
-    }
+<button id="removeResult">
+  Reopen voting (clears votes, keeps leaderboard)
+</button>
 
-    document.getElementById("addRound").onclick = async () => {
-      const secs = parseInt(document.getElementById("newRound").value, 10);
-      if (isNaN(secs) || secs < 0) { msg.textContent = "Enter the seconds."; return; }
-      const { error } = await db.rpc("add_round", { ...creds(), p_seconds: secs });
-      msg.textContent = error ? "Error: " + error.message : "Round added.";
-      loadRounds();
-    };
 
-    // ---- Support tickets ----
-    async function loadTickets() {
-      const { data, error } = await db.rpc("admin_list_tickets", creds());
-      const list = document.getElementById("tickets");
-      list.innerHTML = "";
-      if (error) { msg.textContent = "Error: " + error.message; return; }
-      if (!data.length) { list.textContent = "No tickets."; return; }
-      data.forEach(t => {
-        const li = document.createElement("li");
-        li.append(`${t.voter_name} (${new Date(t.created_at).toLocaleString("de-DE")}) – ${t.status} `);
-        if (t.status === "open") {
-          const b = document.createElement("button");
-          b.textContent = "Revalidate device";
-          b.onclick = async () => {
-            const { error } = await db.rpc("approve_ticket", { ...creds(), p_id: t.id });
-            msg.textContent = error ? "Error: " + error.message : "Device unlocked for " + t.voter_name + ".";
-            loadTickets();
-          };
-          li.append(b);
+<!-- RESET -->
+
+<h2>Reset</h2>
+
+<button id="clear">Clear all votes</button>
+<button id="clearBoard">Clear leaderboard</button>
+
+
+<!-- VOTE MANAGEMENT -->
+
+<h2>Manage votes</h2>
+
+<p id="voteCount">Total votes: –</p>
+
+<button id="loadGuesses" class="refresh">
+  Load / Refresh votes
+</button>
+
+<ul id="guesses"></ul>
+
+
+<!-- ROUNDS -->
+
+<h2>Total time (rounds)</h2>
+
+<p id="total"></p>
+
+<input id="newRound" type="number" min="0"
+placeholder="Seconds">
+
+<button id="addRound">Add round</button>
+
+<ul id="rounds"></ul>
+
+
+<!-- SUPPORT TICKETS -->
+
+<h2>Support tickets</h2>
+
+<button id="loadTickets">Load tickets</button>
+
+<ul id="tickets"></ul>
+
+
+<script>
+
+// ========================================
+// SUPABASE CONNECTION
+// ========================================
+
+const db = supabase.createClient(
+  "https://yxmfpoaujakkixqydgna.supabase.co",
+  "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G"
+);
+
+const msg = document.getElementById("msg");
+
+const creds = () => ({
+  p_user: document.getElementById("user").value.trim(),
+  p_pass: document.getElementById("pass").value
+});
+
+
+// ========================================
+// DECLARE WINNER
+// ========================================
+
+document.getElementById("setResult").onclick = async () => {
+
+  const secs = parseInt(
+    document.getElementById("actual").value, 10
+  );
+
+  if (isNaN(secs) || secs < 0) {
+    msg.textContent = "Enter the real time in seconds.";
+    return;
+  }
+
+  const { error } = await db.rpc("set_result", {
+    ...creds(),
+    p_seconds: secs
+  });
+
+  msg.textContent = error
+    ? "Error: " + error.message
+    : "Time set to " + secs +
+      " s. Winner is now shown on the main page.";
+
+  loadRounds();
+};
+
+
+// ========================================
+// REOPEN VOTING
+// ========================================
+
+document.getElementById("removeResult").onclick = async () => {
+
+  if (!confirm(
+    "Delete all votes and reopen voting? The leaderboard is kept."
+  )) return;
+
+  const { error } = await db.rpc("set_result", {
+    ...creds(),
+    p_seconds: null
+  });
+
+  msg.textContent = error
+    ? "Error: " + error.message
+    : "Votes cleared. Voting is open again.";
+
+  loadGuesses();
+};
+
+
+// ========================================
+// CLEAR ALL VOTES
+// ========================================
+
+document.getElementById("clear").onclick = async () => {
+
+  if (!confirm(
+    "Really delete ALL votes and the result? This cannot be undone."
+  )) return;
+
+  const { error } = await db.rpc("clear_guesses", creds());
+
+  msg.textContent = error
+    ? "Error: " + error.message
+    : "All votes and the result were deleted.";
+
+  loadGuesses();
+};
+
+
+// ========================================
+// CLEAR LEADERBOARD
+// ========================================
+
+document.getElementById("clearBoard").onclick = async () => {
+
+  if (!confirm(
+    "Delete the whole leaderboard? This cannot be undone."
+  )) return;
+
+  const { error } = await db.rpc("clear_leaderboard", creds());
+
+  msg.textContent = error
+    ? "Error: " + error.message
+    : "Leaderboard cleared.";
+};
+
+
+// ========================================
+// VIEW ALL VOTES
+// ========================================
+
+async function loadGuesses() {
+
+  const list = document.getElementById("guesses");
+  const count = document.getElementById("voteCount");
+
+  list.textContent = "Loading votes...";
+  count.textContent = "Loading...";
+
+  const { data, error } = await db.rpc(
+    "admin_list_guesses",
+    creds()
+  );
+
+  if (error) {
+
+    list.textContent = "";
+    count.textContent = "Total votes: –";
+
+    msg.textContent = "Error: " + error.message;
+    return;
+  }
+
+  list.innerHTML = "";
+
+  count.textContent = "Total votes: " + data.length;
+
+  if (!data.length) {
+    list.textContent = "No votes found.";
+    return;
+  }
+
+  data.forEach(vote => {
+
+    const li = document.createElement("li");
+
+    const info = document.createElement("span");
+    info.className = "vote-info";
+
+    const date = vote.submitted_at
+      ? new Date(vote.submitted_at).toLocaleString("de-DE")
+      : "Unknown date";
+
+    info.textContent =
+      vote.voter_name + ": " +
+      vote.guess_seconds + " seconds ";
+
+    const small = document.createElement("span");
+    small.className = "muted";
+    small.textContent = "(" + date + ") ";
+
+    const del = document.createElement("button");
+    del.className = "delete";
+    del.textContent = "Delete";
+
+    del.onclick = async () => {
+
+      if (!confirm(
+        "Really delete " + vote.voter_name +
+        "'s vote of " + vote.guess_seconds + " seconds?"
+      )) return;
+
+      del.disabled = true;
+
+      const { data: deleted, error } = await db.rpc(
+        "admin_delete_guess",
+        {
+          ...creds(),
+          p_id: vote.id
         }
-        list.appendChild(li);
-      });
-    }
-    document.getElementById("loadTickets").onclick = loadTickets;
+      );
 
-    loadRounds();
-  </script>
+      if (error) {
+
+        msg.textContent = "Error: " + error.message;
+        del.disabled = false;
+        return;
+      }
+
+      if (!deleted) {
+
+        msg.textContent = "Vote was not found.";
+        return;
+      }
+
+      msg.textContent =
+        "Vote from " + vote.voter_name + " deleted successfully.";
+
+      loadGuesses();
+    };
+
+    li.append(info, small, del);
+    list.appendChild(li);
+
+  });
+
+}
+
+document.getElementById("loadGuesses").onclick = loadGuesses;
+
+
+// ========================================
+// ROUNDS
+// ========================================
+
+async function loadRounds() {
+
+  const { data, error } = await db
+    .from("rounds")
+    .select("id, seconds, created_at")
+    .order("created_at");
+
+  if (error) {
+    msg.textContent = "Error loading rounds: " + error.message;
+    return;
+  }
+
+  const list = document.getElementById("rounds");
+
+  list.innerHTML = "";
+
+  let sum = 0;
+
+  data.forEach(r => {
+
+    sum += r.seconds;
+
+    const li = document.createElement("li");
+
+    li.append(
+      new Date(r.created_at).toLocaleDateString("de-DE") + " "
+    );
+
+    const inp = document.createElement("input");
+
+    inp.type = "number";
+    inp.min = 0;
+    inp.value = r.seconds;
+
+    const save = document.createElement("button");
+
+    save.textContent = "Save";
+
+    save.onclick = async () => {
+
+      const secs = parseInt(inp.value, 10);
+
+      if (isNaN(secs) || secs < 0) {
+        msg.textContent = "Enter valid seconds.";
+        return;
+      }
+
+      const { error } = await db.rpc("update_round", {
+        ...creds(),
+        p_id: r.id,
+        p_seconds: secs
+      });
+
+      msg.textContent = error
+        ? "Error: " + error.message
+        : "Round updated.";
+
+      loadRounds();
+    };
+
+    const del = document.createElement("button");
+
+    del.textContent = "Delete";
+
+    del.onclick = async () => {
+
+      if (!confirm("Delete this round?")) return;
+
+      const { error } = await db.rpc("delete_round", {
+        ...creds(),
+        p_id: r.id
+      });
+
+      msg.textContent = error
+        ? "Error: " + error.message
+        : "Round deleted.";
+
+      loadRounds();
+    };
+
+    li.append(inp, save, del);
+
+    list.appendChild(li);
+
+  });
+
+  document.getElementById("total").textContent =
+    `Total: ${sum} s (${data.length} rounds)`;
+
+}
+
+
+// ========================================
+// ADD ROUND
+// ========================================
+
+document.getElementById("addRound").onclick = async () => {
+
+  const secs = parseInt(
+    document.getElementById("newRound").value, 10
+  );
+
+  if (isNaN(secs) || secs < 0) {
+    msg.textContent = "Enter the seconds.";
+    return;
+  }
+
+  const { error } = await db.rpc("add_round", {
+    ...creds(),
+    p_seconds: secs
+  });
+
+  msg.textContent = error
+    ? "Error: " + error.message
+    : "Round added.";
+
+  document.getElementById("newRound").value = "";
+
+  loadRounds();
+};
+
+
+// ========================================
+// SUPPORT TICKETS
+// ========================================
+
+async function loadTickets() {
+
+  const { data, error } = await db.rpc(
+    "admin_list_tickets",
+    creds()
+  );
+
+  const list = document.getElementById("tickets");
+
+  list.innerHTML = "";
+
+  if (error) {
+    msg.textContent = "Error: " + error.message;
+    return;
+  }
+
+  if (!data.length) {
+    list.textContent = "No tickets.";
+    return;
+  }
+
+  data.forEach(t => {
+
+    const li = document.createElement("li");
+
+    li.append(
+      `${t.voter_name} (${new Date(t.created_at)
+      .toLocaleString("de-DE")}) – ${t.status} `
+    );
+
+    if (t.status === "open") {
+
+      const b = document.createElement("button");
+
+      b.textContent = "Revalidate device";
+
+      b.onclick = async () => {
+
+        const { error } = await db.rpc("approve_ticket", {
+          ...creds(),
+          p_id: t.id
+        });
+
+        msg.textContent = error
+          ? "Error: " + error.message
+          : "Device unlocked for " + t.voter_name + ".";
+
+        loadTickets();
+      };
+
+      li.append(b);
+
+    }
+
+    list.appendChild(li);
+
+  });
+
+}
+
+document.getElementById("loadTickets").onclick = loadTickets;
+
+
+// ========================================
+// INITIAL LOAD
+// ========================================
+
+loadRounds();
+
+</script>
+
 </body>
 </html>
