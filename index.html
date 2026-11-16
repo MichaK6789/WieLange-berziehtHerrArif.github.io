@@ -1,294 +1,205 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wie lange überzieht Herr Arif?</title>
-  <style>
-    :root {
-      --bg1: #eef2ff;
-      --bg2: #f8fafc;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --accent: #4f46e5;
-      --accent-hover: #4338ca;
-      --accent-soft: #eef2ff;
-      --gold: #f59e0b;
-      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg1: #0f172a;
-        --bg2: #020617;
-        --card: #1e293b;
-        --text: #f1f5f9;
-        --muted: #94a3b8;
-        --border: #334155;
-        --accent: #818cf8;
-        --accent-hover: #6366f1;
-        --accent-soft: #312e81;
-        --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      }
-    }
-
-    * { box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
-      color: var(--text);
-      background: linear-gradient(160deg, var(--bg1), var(--bg2)) fixed;
-      line-height: 1.5;
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      padding: 14px 20px;
-      background: color-mix(in srgb, var(--card) 85%, transparent);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-    }
-    header h1 {
-      grid-column: 2;
-      margin: 0;
-      font-size: clamp(1.1rem, 3.5vw, 1.6rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      text-align: center;
-    }
-    .nav { grid-column: 3; justify-self: end; }
-    .nav a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 999px;
-      transition: background 0.15s;
-    }
-    .nav a:hover { background: var(--accent-soft); }
-
-    main {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 28px 16px 60px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 22px;
-      margin-bottom: 22px;
-    }
-    .card h2 {
-      margin: 0 0 14px;
-      font-size: 1.15rem;
-      letter-spacing: -0.01em;
-    }
-
-    .form { display: flex; flex-wrap: wrap; gap: 10px; }
-    input {
-      flex: 1 1 160px;
-      padding: 12px 14px;
-      font-size: 1rem;
-      color: var(--text);
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
-    }
-    button {
-      flex: 1 1 100%;
-      padding: 12px 18px;
-      font-size: 1rem;
-      font-weight: 700;
-      color: #fff;
-      background: var(--accent);
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.05s;
-    }
-    button:hover { background: var(--accent-hover); }
-    button:active { transform: scale(0.98); }
-
-    #msg { margin: 12px 0 0; min-height: 1.4em; color: var(--muted); }
-
-    #winnerCard {
-      border: 2px solid var(--gold);
-      background: color-mix(in srgb, var(--gold) 10%, var(--card));
-    }
-    #winner { margin: 0; font-weight: 700; font-size: 1.05rem; }
-
-    #stats { margin: 0 0 12px; color: var(--muted); }
-
-    ul, ol { list-style: none; margin: 0; padding: 0; }
-    .list { max-height: 360px; overflow-y: auto; }
-    .list li {
-      padding: 10px 12px;
-      border-radius: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-    .list li:last-child { border-bottom: none; }
-    .list li:nth-child(odd) { background: var(--bg2); }
-    .empty { color: var(--muted); font-style: italic; }
-    .small { display: block; color: var(--muted); font-size: 0.85rem; }
-
-    @media (max-width: 520px) {
-      header { grid-template-columns: 1fr; gap: 6px; text-align: center; }
-      header h1, .nav { grid-column: 1; justify-self: center; }
-      .card { padding: 18px; }
-    }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wie lange überzieht Herr Arif?</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#f3f2ee;--card:#fbfaf7;--text:#1d1d22;--muted:#6b6b73;--line:#dcdad2;--hero:#26262b;--green:#4ade80;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1b1f;--card:#232328;--text:#f1efe9;--muted:#a3a3ab;--line:#38383f;--hero:#26262b}}
+:root[data-theme="dark"]{--bg:#1b1b1f;--card:#232328;--text:#f1efe9;--muted:#a3a3ab;--line:#38383f;--hero:#26262b}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:14px 26px;background:var(--bg);border-bottom:1px solid var(--line)}
+.logo{font-size:1.6rem;font-weight:600;letter-spacing:-.01em}
+.links{display:flex;gap:26px}
+.links a{color:var(--text);text-decoration:none;font-size:.92rem}
+.links a:hover{opacity:.6}
+.right{justify-self:end;display:flex;gap:8px}
+.pill{display:inline-block;padding:8px 16px;border-radius:999px;font-size:.85rem;font-weight:600;text-decoration:none;border:1px solid var(--text);cursor:pointer}
+.admin{padding:8px 12px;color:var(--muted);font-size:.9rem;text-decoration:none;opacity:.7}
+.admin:hover{opacity:1}
+.hero{position:relative;background:var(--hero);color:#fff;text-align:center;padding:90px 22px 150px;overflow:hidden;
+background-image:radial-gradient(rgba(255,255,255,.12) 1px,transparent 1.5px),radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.5px);background-size:46px 46px,27px 27px;background-position:0 0,13px 19px}
+.hero h1{margin:0 auto;max-width:900px;font-size:clamp(2.6rem,8vw,5.2rem);font-weight:400;line-height:1.05;letter-spacing:-.02em}
+.hero p{max-width:420px;margin:30px auto 26px;color:#d6d6da;font-size:1.02rem}
+.hero .pill{background:#fff;color:#111;border-color:#fff}
+.clock{position:absolute;right:5%;top:46%;transform:translateY(-50%);width:clamp(100px,12vw,170px);height:auto}
+@media (max-width:1000px){.clock{display:none}}
+.wave{position:absolute;left:0;bottom:-1px;width:100%;height:80px;display:block}
+main{max-width:720px;margin:0 auto;padding:30px 18px 0}
+.card{background:none;border:none;border-top:1px solid var(--line);border-radius:0;padding:36px 0 14px;margin-bottom:22px}
+.card:first-child{border-top:none;padding-top:10px}
+.card h2{margin:0 0 16px;font-size:1.9rem;font-weight:500}
+.form{display:flex;flex-wrap:wrap;gap:12px}
+input{flex:1 1 160px;padding:13px 16px;font-size:1rem;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:12px;outline:none}
+input:focus{border-color:var(--text)}
+button{flex:1 1 100%;padding:13px;font-size:1rem;font-weight:600;color:var(--bg);background:var(--text);border:none;border-radius:999px;cursor:pointer}
+button:active{transform:scale(.98)}
+#msg{margin:12px 0 0;min-height:1.4em;color:var(--muted)}
+#winnerCard{background:var(--hero);color:#fff;border:none;border-radius:22px;padding:28px;margin:26px 0}
+#winner{margin:0;font-weight:600}
+#stats{margin:0 0 12px;color:var(--muted)}
+ul,ol{list-style:none;margin:0;padding:0}
+.list{max-height:360px;overflow-y:auto}
+.list li{padding:10px 2px;border-bottom:1px solid var(--line)}
+.list li:last-child{border-bottom:none}
+.empty{color:var(--muted);font-style:italic}
+.small{display:block;color:var(--muted);font-size:.85rem}
+.demo{text-align:center;color:var(--muted);font-size:.85rem;margin:26px 0 0}
+#ergebnisse{position:sticky;top:90px;z-index:1;background:var(--bg)}
+#bestenliste{position:relative;z-index:2;background:var(--card);border-top:none;border-radius:28px 28px 0 0;padding:36px 26px 90px;margin:40px -18px 0;min-height:85vh;box-shadow:0 -14px 40px rgba(0,0,0,.18)}
+@media (max-width:700px){.links{display:none}nav{grid-template-columns:1fr auto}.hero{padding:70px 20px 130px}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
 </head>
 <body>
-  <header>
-    <h1>Wie lange überzieht Herr Arif?</h1>
-    <div class="nav"><a href="admin.html">Admin</a></div>
-  </header>
+<nav>
+<div class="logo serif">Arif-Tipp</div>
+<div class="links"><a href="#tipp">Tipp abgeben</a><a href="#ergebnisse">Ergebnisse</a><a href="#bestenliste">Bestenliste</a></div>
+<div class="right"><a class="admin" href="admin.html">Admin</a></div>
+</nav>
 
-  <main>
-    <section class="card">
-      <h2>Dein Tipp</h2>
-      <div class="form">
-        <input id="name" placeholder="Dein Name" maxlength="40" autocomplete="off">
-        <input id="secs" type="number" min="0" placeholder="Tipp (Sekunden)">
-        <button id="send">Abschicken</button>
-      </div>
-      <p id="msg"></p>
-    </section>
+<section class="hero">
+<svg class="clock" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-linecap="round" aria-hidden="true">
+<circle cx="50" cy="50" r="46" stroke-width="1.6"/>
+<g stroke-width="1.6"><path d="M50 8v6M50 86v6M8 50h6M86 50h6"/></g>
+<g stroke-width="1" opacity=".6"><path d="M71 13.6l-3 5.2M86.4 29l-5.2 3M86.4 71l-5.2-3M71 86.4l-3-5.2M29 86.4l3-5.2M13.6 71l5.2-3M13.6 29l5.2 3M29 13.6l3 5.2"/></g>
+<path id="hh" d="M50 50V28" stroke-width="3"/>
+<path id="mh" d="M50 50V17" stroke-width="2"/>
+<path id="sh" d="M50 58V13" stroke="#4ade80" stroke-width="1.2"/>
+<circle cx="50" cy="50" r="2.5" fill="#4ade80" stroke="none"/>
+</svg>
+<h1 class="serif">Wie lange überzieht Herr Arif?</h1>
+<p>Tippe, wie viele Sekunden Herr Arif die Stunde überzieht. Wer am nächsten dran ist, gewinnt.</p>
+<a class="pill" href="#tipp">Jetzt tippen</a>
+<svg class="wave" viewBox="0 0 1200 80" preserveAspectRatio="none"><path d="M0 80 V44 C120 14 260 58 420 36 C600 8 760 54 940 30 C1060 14 1140 34 1200 42 V80 Z" fill="var(--bg)"/></svg>
+</section>
 
-    <section class="card" id="winnerCard" hidden>
-      <h2>🏆 Gewinner</h2>
-      <p id="winner"></p>
-    </section>
+<main>
+<section class="card" id="tipp">
+<h2 class="serif">Dein Tipp</h2>
+<div class="form">
+<input id="name" placeholder="Dein Name" maxlength="40" autocomplete="off">
+<input id="secs" type="number" min="0" placeholder="Tipp (Sekunden)">
+<button id="send">Abschicken</button>
+</div>
+<p id="msg"></p>
+</section>
+<section class="card" id="winnerCard" hidden>
+<h2 class="serif">Gewinner</h2>
+<p id="winner"></p>
+</section>
+<section class="card" id="ergebnisse">
+<h2 class="serif">Ergebnisse</h2>
+<p id="stats"></p>
+<ul id="results" class="list"></ul>
+</section>
+<section class="card" id="bestenliste">
+<h2 class="serif">Bestenliste</h2>
+<ol id="leaderboard" class="list"></ol>
+<p class="demo" id="demoNote" hidden>Vorschau mit Beispieldaten</p>
+</section>
+</main>
 
-    <section class="card">
-      <h2>Ergebnisse</h2>
-      <p id="stats"></p>
-      <ul id="results" class="list"></ul>
-    </section>
+<script>
+const DEMO = false; // true = Vorschau mit Beispieldaten
+const db = DEMO ? null : supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
+const TABLE = "guesses";
+const demo = {
+  actual: 95,
+  guesses: [{voter_name:"Lena",guess_seconds:60},{voter_name:"Kit",guess_seconds:120},{voter_name:"Jonas",guess_seconds:90},{voter_name:"Mira",guess_seconds:300},{voter_name:"Tom",guess_seconds:100}],
+  board: [{voter_name:"Sara",guess_seconds:180,actual_seconds:185,diff_seconds:5,submitted_at:"2026-11-09T08:12:00Z"},{voter_name:"Ben",guess_seconds:45,actual_seconds:47,diff_seconds:2,submitted_at:"2026-11-12T08:05:00Z"}]
+};
+if (DEMO) document.getElementById("demoNote").hidden = false;
 
-    <section class="card">
-      <h2>Bestenliste</h2>
-      <ol id="leaderboard" class="list"></ol>
-    </section>
-  </main>
+document.getElementById("send").onclick = async () => {
+  const voter_name = document.getElementById("name").value.trim();
+  const guess_seconds = parseInt(document.getElementById("secs").value, 10);
+  const msg = document.getElementById("msg");
+  if (!voter_name || isNaN(guess_seconds)) { msg.textContent = "Bitte gib einen Namen und eine Zahl ein."; return; }
+  if (DEMO) { demo.guesses.push({voter_name, guess_seconds}); msg.textContent = "Danke fürs Abstimmen!"; loadResults(); return; }
+  const { error } = await db.from(TABLE).insert({ voter_name, guess_seconds });
+  if (error) {
+    msg.textContent = error.message.includes("row-level security") ? "Die Abstimmung ist geschlossen (ein Ergebnis wurde festgelegt)." : "Fehler: " + error.message;
+    return;
+  }
+  msg.textContent = "Danke fürs Abstimmen!";
+  loadResults();
+};
 
-  <script>
-    const db = supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
-    const TABLE = "guesses";
+function addItem(list, text, sub) {
+  const li = document.createElement("li");
+  li.textContent = text;
+  if (sub) { const s = document.createElement("span"); s.className = "small"; s.textContent = sub; li.appendChild(s); }
+  list.appendChild(li);
+}
+function addEmpty(list, text) {
+  const li = document.createElement("li"); li.className = "empty"; li.textContent = text; list.appendChild(li);
+}
 
-    document.getElementById("send").onclick = async () => {
-      const voter_name = document.getElementById("name").value.trim();
-      const guess_seconds = parseInt(document.getElementById("secs").value, 10);
-      const msg = document.getElementById("msg");
+async function loadResults() {
+  const msg = document.getElementById("msg");
+  let data, actual;
+  if (DEMO) {
+    data = [...demo.guesses].sort((a, b) => a.guess_seconds - b.guess_seconds);
+    actual = demo.actual;
+  } else {
+    const [g, r] = await Promise.all([
+      db.from(TABLE).select("voter_name, guess_seconds").order("guess_seconds"),
+      db.from("game_result").select("actual_seconds").maybeSingle()
+    ]);
+    if (g.error) { msg.textContent = "Ladefehler: " + g.error.message; return; }
+    data = g.data;
+    actual = r.data ? r.data.actual_seconds : null;
+  }
+  const list = document.getElementById("results");
+  list.innerHTML = "";
+  if (!data.length) addEmpty(list, "Noch keine Tipps.");
+  data.forEach(x => addItem(list, `${x.voter_name}: ${x.guess_seconds} s`));
+  const avg = data.length ? Math.round(data.reduce((s, x) => s + x.guess_seconds, 0) / data.length) : 0;
+  document.getElementById("stats").textContent = `${data.length} Tipps, Durchschnitt ${avg} s`;
 
-      if (!voter_name || isNaN(guess_seconds)) {
-        msg.textContent = "Bitte gib einen Namen und eine Zahl ein.";
-        return;
-      }
-      const { error } = await db.from(TABLE).insert({ voter_name, guess_seconds });
-      if (error) {
-        msg.textContent = error.message.includes("row-level security")
-          ? "Die Abstimmung ist geschlossen (ein Ergebnis wurde festgelegt)."
-          : "Fehler: " + error.message;
-        return;
-      }
-      msg.textContent = "Danke fürs Abstimmen!";
-      loadResults();
-    };
+  const card = document.getElementById("winnerCard"), winner = document.getElementById("winner");
+  if (actual === null || !data.length) { card.hidden = true; winner.textContent = ""; return; }
+  const best = Math.min(...data.map(x => Math.abs(x.guess_seconds - actual)));
+  const winners = data.filter(x => Math.abs(x.guess_seconds - actual) === best);
+  card.hidden = false;
+  winner.textContent = `Echte Zeit: ${actual} s. ` + (winners.length > 1 ? "Gewinner (Gleichstand): " : "Gewinner: ") +
+    winners.map(x => `${x.voter_name} (${x.guess_seconds} s, ${best} s daneben)`).join(", ");
+}
 
-    function addItem(list, text, sub) {
-      const li = document.createElement("li");
-      li.textContent = text;
-      if (sub) {
-        const s = document.createElement("span");
-        s.className = "small";
-        s.textContent = sub;
-        li.appendChild(s);
-      }
-      list.appendChild(li);
-    }
+async function loadLeaderboard() {
+  let data;
+  if (DEMO) data = demo.board;
+  else {
+    const r = await db.from("leaderboard").select("voter_name, guess_seconds, actual_seconds, diff_seconds, submitted_at").order("declared_at", { ascending: true });
+    if (r.error) return;
+    data = r.data;
+  }
+  const list = document.getElementById("leaderboard");
+  list.innerHTML = "";
+  if (!data.length) addEmpty(list, "Noch keine Gewinner.");
+  data.forEach(x => addItem(list,
+    `${x.voter_name}: Tipp ${x.guess_seconds} s, echte Zeit ${x.actual_seconds} s (${x.diff_seconds} s daneben)`,
+    `Abgegeben am ${new Date(x.submitted_at).toLocaleString("de-DE")}`));
+}
 
-    function addEmpty(list, text) {
-      const li = document.createElement("li");
-      li.className = "empty";
-      li.textContent = text;
-      list.appendChild(li);
-    }
+function setHand(id, a) { document.getElementById(id).setAttribute("transform", `rotate(${a} 50 50)`); }
+function tick() {
+  const d = new Date(), s = d.getSeconds(), m = d.getMinutes() + s / 60, h = (d.getHours() % 12) + m / 60;
+  setHand("hh", h * 30); setHand("mh", m * 6); setHand("sh", s * 6);
+}
+tick();
+setInterval(tick, 1000);
 
-    async function loadResults() {
-      const msg = document.getElementById("msg");
-      const [g, r] = await Promise.all([
-        db.from(TABLE).select("voter_name, guess_seconds").order("guess_seconds"),
-        db.from("game_result").select("actual_seconds").maybeSingle()
-      ]);
-      if (g.error) { msg.textContent = "Ladefehler: " + g.error.message; return; }
-      const data = g.data;
-      const actual = r.data ? r.data.actual_seconds : null;
-
-      const list = document.getElementById("results");
-      list.innerHTML = "";
-      if (!data.length) addEmpty(list, "Noch keine Tipps.");
-      data.forEach(x => addItem(list, `${x.voter_name}: ${x.guess_seconds} s`));
-
-      const avg = data.length ? Math.round(data.reduce((s, x) => s + x.guess_seconds, 0) / data.length) : 0;
-      document.getElementById("stats").textContent = `${data.length} Tipps, Durchschnitt ${avg} s`;
-
-      const card = document.getElementById("winnerCard");
-      const winner = document.getElementById("winner");
-      if (actual === null || !data.length) {
-        card.hidden = true;
-        winner.textContent = "";
-        return;
-      }
-      const best = Math.min(...data.map(x => Math.abs(x.guess_seconds - actual)));
-      const winners = data.filter(x => Math.abs(x.guess_seconds - actual) === best);
-      card.hidden = false;
-      winner.textContent =
-        `Echte Zeit: ${actual} s. ` +
-        (winners.length > 1 ? "Gewinner (Gleichstand): " : "Gewinner: ") +
-        winners.map(x => `${x.voter_name} (${x.guess_seconds} s, ${best} s daneben)`).join(", ");
-    }
-
-    async function loadLeaderboard() {
-      const { data, error } = await db
-        .from("leaderboard")
-        .select("voter_name, guess_seconds, actual_seconds, diff_seconds, submitted_at")
-        .order("declared_at", { ascending: true }); // älteste zuerst; false für neueste zuerst
-      if (error) return;
-      const list = document.getElementById("leaderboard");
-      list.innerHTML = "";
-      if (!data.length) addEmpty(list, "Noch keine Gewinner.");
-      data.forEach(x => addItem(
-        list,
-        `${x.voter_name}: Tipp ${x.guess_seconds} s, echte Zeit ${x.actual_seconds} s (${x.diff_seconds} s daneben)`,
-        `Abgegeben am ${new Date(x.submitted_at).toLocaleString("de-DE")}`
-      ));
-    }
-
-    loadResults();
-    loadLeaderboard();
-    setInterval(() => { loadResults(); loadLeaderboard(); }, 5000);
-  </script>
+loadResults();
+loadLeaderboard();
+setInterval(() => { loadResults(); loadLeaderboard(); }, 5000);
+</script>
 </body>
 </html>
