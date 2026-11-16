@@ -27,6 +27,9 @@
   <p id="stats"></p>
   <ul id="results"></ul>
 
+  <h2>Leaderboard</h2>
+  <ol id="leaderboard"></ol>
+
   <script>
     const db = supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
     const TABLE = "guesses";
@@ -41,7 +44,12 @@
         return;
       }
       const { error } = await db.from(TABLE).insert({ voter_name, guess_seconds });
-      if (error) { msg.textContent = "Error: " + error.message; return; }
+      if (error) {
+        msg.textContent = error.message.includes("row-level security")
+          ? "Voting is closed (a result has been set)."
+          : "Error: " + error.message;
+        return;
+      }
       msg.textContent = "Thanks for voting!";
       loadResults();
     };
@@ -82,8 +90,26 @@
         winners.map(x => `${x.voter_name} (${x.guess_seconds} s, off by ${best} s)`).join(", ");
     }
 
+    async function loadLeaderboard() {
+      const { data, error } = await db
+        .from("leaderboard")
+        .select("voter_name, guess_seconds, actual_seconds, diff_seconds, submitted_at")
+        .order("declared_at", { ascending: true }); // oldest first; use false for newest first
+      if (error) return;
+      const list = document.getElementById("leaderboard");
+      list.innerHTML = "";
+      data.forEach(x => {
+        const li = document.createElement("li");
+        li.textContent =
+          `${x.voter_name}: guessed ${x.guess_seconds} s, real time ${x.actual_seconds} s ` +
+          `(off by ${x.diff_seconds} s), submitted ${new Date(x.submitted_at).toLocaleString()}`;
+        list.appendChild(li);
+      });
+    }
+
     loadResults();
-    setInterval(loadResults, 5000);
+    loadLeaderboard();
+    setInterval(() => { loadResults(); loadLeaderboard(); }, 5000);
   </script>
 </body>
 </html>
