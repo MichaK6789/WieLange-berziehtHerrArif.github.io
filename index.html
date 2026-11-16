@@ -40,13 +40,8 @@
         msg.textContent = "Please enter a name and a number.";
         return;
       }
-      if (localStorage.getItem("voted")) {
-        msg.textContent = "You already voted on this device.";
-        return;
-      }
       const { error } = await db.from(TABLE).insert({ voter_name, guess_seconds });
       if (error) { msg.textContent = "Error: " + error.message; return; }
-      localStorage.setItem("voted", "1");
       msg.textContent = "Thanks for voting!";
       loadResults();
     };
