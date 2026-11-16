@@ -204,7 +204,7 @@ async function loadLeaderboard() {
 
   data.forEach(x => addItem(list,
     `${x.voter_name}: Tipp ${x.guess_seconds} s, echte Zeit ${x.actual_seconds} s (${x.diff_seconds} s daneben)`,
-    `Abgegeben am ${new Date(x.submitted_at).toLocaleString("de-DE")}`));
+    `Abgegeben am ${new Date(x.submitted_at).toLocaleDateString("de-DE")}`));
 }
 
 function setHand(id, a) { document.getElementById(id).setAttribute("transform", `rotate(${a} 50 50)`); }
