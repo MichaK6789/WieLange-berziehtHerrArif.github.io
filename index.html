@@ -235,7 +235,9 @@ function setAccountMessage(text) {
 }
 
 function updateTypo() {
-  document.getElementById("typoBtn").hidden = true;
+  const btn = document.getElementById("typoBtn");
+  if (!btn) return;
+  btn.hidden = false;
 }
 
 function setAuthUI(user, account) {
