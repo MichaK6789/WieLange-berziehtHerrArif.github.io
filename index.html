@@ -235,14 +235,19 @@ function setAccountMessage(text) {
   document.getElementById("accountMsg").textContent = text || "";
 }
 
+
+// ========================================
+// VERTIPPT-BUTTON AKTUALISIEREN
+// ========================================
+
 async function updateTypo() {
-  const typoButton = document.getElementById("typoButton");
+  const typoButton = document.getElementById("typoBtn");
 
   if (!typoButton) return;
 
-  // Ohne Anmeldung keine Ticket-Anfrage
-  if (!currentUser) {
-    typoButton.style.display = "none";
+  // Ohne Anmeldung oder ohne geladenes Konto ausblenden
+  if (!currentUser || !currentAccount) {
+    typoButton.hidden = true;
     return;
   }
 
@@ -255,14 +260,14 @@ async function updateTypo() {
 
   if (error) {
     console.error("Fehler beim Prüfen des Tipps:", error);
-    typoButton.style.display = "none";
+    typoButton.hidden = true;
     return;
   }
 
-  // Nur anzeigen, wenn noch kein Tipp vorhanden ist
-  typoButton.style.display =
-    data && data.length > 0 ? "none" : "inline-block";
+  // Nur anzeigen, wenn bereits ein Tipp existiert
+  typoButton.hidden = !(data && data.length > 0);
 }
+
 
 function setAuthUI(user, account) {
   currentUser = user || null;
@@ -289,7 +294,11 @@ function setAuthUI(user, account) {
     document.getElementById("accountIntro").textContent =
       "Dein Konto ist aktiv. Punkte werden nach Feststellung des Ergebnisses gutgeschrieben.";
   }
+
+  // Nach jeder Änderung des Login-Status den Button prüfen
+  updateTypo();
 }
+
 
 async function loadAccount(user) {
   if (!user) {
@@ -335,6 +344,7 @@ async function loadAccount(user) {
   setAuthUI(user,account);
 }
 
+
 async function signIn() {
   const email = document.getElementById("accountEmail").value.trim();
   const password = document.getElementById("accountPassword").value;
@@ -356,6 +366,7 @@ async function signIn() {
 
   await loadAccount(data.user);
 }
+
 
 async function signUp() {
   const email = document.getElementById("accountEmail").value.trim();
@@ -398,6 +409,7 @@ async function signUp() {
     setAccountMessage("Konto erstellt. Falls du dich nicht direkt anmelden kannst, prüfe, ob „Confirm email“ in Supabase deaktiviert ist.");
   }
 }
+
 
 async function signOut() {
   const {error} = await db.auth.signOut();
@@ -451,6 +463,7 @@ async function submitGuess() {
 
     if (existingVote && existingVote.length > 0) {
       msg.textContent = "Du hast bereits einen Tipp abgegeben.";
+      await updateTypo();
       return;
     }
 
@@ -466,7 +479,9 @@ async function submitGuess() {
     }
 
     ls.del("voted");
-    updateTypo();
+
+    // Nach erfolgreicher Tippabgabe Button einblenden
+    await updateTypo();
 
     msg.textContent = "Danke fürs Abstimmen!";
     document.getElementById("secs").value = "";
@@ -507,8 +522,12 @@ async function checkTicket() {
 
     await loadResults();
     await loadLeaderboard();
+
+    // Der alte Tipp wurde gelöscht: Button ausblenden
+    await updateTypo();
   }
 }
+
 
 const modal = document.getElementById("modal");
 
@@ -523,6 +542,7 @@ document.getElementById("ticketClose").onclick = () => {
 modal.onclick = event => {
   if (event.target === modal) modal.hidden = true;
 };
+
 
 document.getElementById("ticketSend").onclick = async () => {
   const name = document.getElementById("ticketName").value.trim();
@@ -586,6 +606,7 @@ function fmt(seconds) {
   ].filter(Boolean).join(" ");
 }
 
+
 function addItem(list,text,sub) {
   const li = document.createElement("li");
   li.textContent = text;
@@ -600,12 +621,14 @@ function addItem(list,text,sub) {
   list.appendChild(li);
 }
 
+
 function addEmpty(list,text) {
   const li = document.createElement("li");
   li.className = "empty";
   li.textContent = text;
   list.appendChild(li);
 }
+
 
 async function loadResults() {
   const [guesses,result] = await Promise.all([
@@ -750,8 +773,6 @@ setInterval(tick,1000);
 // ========================================
 // AUTH INITIALIZATION
 // ========================================
-
-updateTypo();
 
 db.auth.getSession().then(({data}) => {
   loadAccount(data.session ? data.session.user : null);
