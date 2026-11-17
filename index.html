@@ -1,283 +1,1264 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Wie lange überzieht <br> Herr Arif?</title>
+<title>Wie lange überzieht Herr Arif?</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap">
+
 <style>
-:root{--bg:#f3f2ee;--card:#fbfaf7;--text:#1d1d22;--muted:#6b6b73;--line:#dcdad2;--hero:#26262b;--green:#4ade80;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1b1f;--card:#232328;--text:#f1efe9;--muted:#a3a3ab;--line:#38383f;--hero:#26262b}}
-:root[data-theme="dark"]{--bg:#1b1b1f;--card:#232328;--text:#f1efe9;--muted:#a3a3ab;--line:#38383f;--hero:#26262b}
-html{scroll-behavior:smooth;scroll-padding-top:90px}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
-.serif{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif}
-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:14px 26px;background:var(--bg);border-bottom:1px solid var(--line)}
-.logo{font-size:1.6rem;font-weight:600;letter-spacing:-.01em}
-.links{display:flex;gap:26px}
-.links a{color:var(--text);text-decoration:none;font-size:.92rem}
-.links a:hover{opacity:.6}
-.right{justify-self:end;display:flex;gap:8px;align-items:center}
-.pill{display:inline-block;padding:8px 16px;border-radius:999px;font-size:.85rem;font-weight:600;text-decoration:none;border:1px solid var(--text);cursor:pointer}
-.admin{padding:8px 12px;color:var(--muted);font-size:.9rem;text-decoration:none;opacity:.7}
-.admin:hover{opacity:1}
-.hero{position:relative;background:var(--hero);color:#fff;text-align:center;padding:90px 22px 150px;overflow:hidden;
-background-image:radial-gradient(rgba(255,255,255,.12) 1px,transparent 1.5px),radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.5px);background-size:46px 46px,27px 27px;background-position:0 0,13px 19px}
-.hero h1{margin:0 auto;max-width:900px;font-size:clamp(2.6rem,8vw,5.2rem);font-weight:400;line-height:1.05;letter-spacing:-.02em}
-.hero p{max-width:420px;margin:30px auto 26px;color:#d6d6da;font-size:1.02rem}
-.hero .pill{background:#fff;color:#111;border-color:#fff}
-.clock{position:absolute;right:5%;top:46%;transform:translateY(-50%);width:clamp(100px,12vw,170px);height:auto}
-@media (max-width:1000px){.clock{display:none}}
-.wave{position:absolute;left:0;bottom:-1px;width:100%;height:80px;display:block}
-main{max-width:720px;margin:0 auto;padding:30px 18px 0}
-.card{background:none;border:none;border-top:1px solid var(--line);border-radius:0;padding:36px 0 14px;margin-bottom:22px}
-.card:first-child{border-top:none;padding-top:10px}
-.card h2{margin:0 0 16px;font-size:1.9rem;font-weight:500}
-.form{display:flex;flex-wrap:wrap;gap:12px}
-input{flex:1 1 160px;padding:13px 16px;font-size:1rem;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:12px;outline:none}
-input:focus{border-color:var(--text)}
-button{flex:1 1 100%;padding:13px;font-size:1rem;font-weight:600;color:var(--bg);background:var(--text);border:none;border-radius:999px;cursor:pointer}
-button:active{transform:scale(.98)}
-#msg{margin:12px 0 0;min-height:1.4em;color:var(--muted)}
-#winnerCard{background:var(--hero);color:#fff;border:none;border-radius:22px;padding:28px;margin:26px 0}
-#winner{margin:0;font-weight:600}
-#stats,.total{margin:0 0 12px;color:var(--muted)}
-ul,ol{list-style:none;margin:0;padding:0}
-.list{max-height:360px;overflow-y:auto}
-.list li{padding:10px 2px;border-bottom:1px solid var(--line)}
-.list li:last-child{border-bottom:none}
-.empty{color:var(--muted);font-style:italic}
-.small{display:block;color:var(--muted);font-size:.85rem}
-.demo{text-align:center;color:var(--muted);font-size:.85rem;margin:26px 0 0}
-#ergebnisse{position:sticky;top:90px;z-index:1;background:var(--bg)}
-#bestenliste{position:relative;z-index:2;background:var(--card);border-top:none;border-radius:28px 28px 0 0;padding:36px 26px 90px;margin:40px -18px 0;min-height:85vh;box-shadow:0 -14px 40px rgba(0,0,0,.18)}
-.typo{flex:none;padding:8px 12px;background:none;border-radius:0;color:var(--muted);font-size:.9rem;font-weight:400;opacity:.7}
-.typo:hover{opacity:1}
-.modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.45)}
-.modal[hidden]{display:none}
-.sheet{width:100%;max-width:440px;background:var(--card);border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:12px}
-.sheet h2{margin:0;font-size:1.9rem;font-weight:500}
-.sheet p{margin:0}
-.sheet input,.sheet button{flex:none}
-.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
-@media (max-width:700px){.links{display:none}nav{grid-template-columns:1fr auto}.hero{padding:70px 20px 130px}}
+:root {
+  --bg:#f3f2ee;
+  --card:#fbfaf7;
+  --text:#1d1d22;
+  --muted:#6b6b73;
+  --line:#dcdad2;
+  --hero:#26262b;
+  --green:#4ade80;
+}
+
+* { box-sizing:border-box; }
+
+html {
+  scroll-behavior:smooth;
+  scroll-padding-top:90px;
+}
+
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.5;
+}
+
+.serif {
+  font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+}
+
+nav {
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:12px;
+  padding:14px 26px;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+}
+
+.logo {
+  font-size:1.6rem;
+  font-weight:600;
+}
+
+.links {
+  display:flex;
+  gap:26px;
+}
+
+.links a {
+  color:var(--text);
+  text-decoration:none;
+}
+
+.right {
+  justify-self:end;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.account-status {
+  font-size:.85rem;
+  color:var(--muted);
+  max-width:150px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.admin {
+  padding:8px 12px;
+  color:var(--muted);
+  font-size:.9rem;
+  text-decoration:none;
+}
+
+.hero {
+  position:relative;
+  background:var(--hero);
+  color:white;
+  text-align:center;
+  padding:90px 22px 150px;
+  overflow:hidden;
+  background-image:
+    radial-gradient(rgba(255,255,255,.12) 1px,transparent 1.5px),
+    radial-gradient(rgba(255,255,255,.07) 1px,transparent 1.5px);
+  background-size:46px 46px,27px 27px;
+}
+
+.hero h1 {
+  margin:0 auto;
+  max-width:900px;
+  font-size:clamp(2.6rem,8vw,5.2rem);
+  font-weight:400;
+  line-height:1.05;
+}
+
+.hero p {
+  max-width:420px;
+  margin:30px auto 26px;
+  color:#d6d6da;
+}
+
+.pill {
+  display:inline-block;
+  padding:8px 16px;
+  border-radius:999px;
+  font-size:.85rem;
+  font-weight:600;
+  text-decoration:none;
+  background:white;
+  color:#111;
+}
+
+.clock {
+  position:absolute;
+  right:5%;
+  top:46%;
+  transform:translateY(-50%);
+  width:clamp(100px,12vw,170px);
+}
+
+.wave {
+  position:absolute;
+  left:0;
+  bottom:-1px;
+  width:100%;
+  height:80px;
+}
+
+@media(max-width:1000px) {
+  .clock { display:none; }
+}
+
+main {
+  max-width:720px;
+  margin:0 auto;
+  padding:30px 18px 0;
+}
+
+.card {
+  border-top:1px solid var(--line);
+  padding:36px 0 14px;
+  margin-bottom:22px;
+}
+
+.card h2,
+.account-card h2 {
+  margin:0 0 16px;
+  font-size:1.9rem;
+  font-weight:500;
+}
+
+.form {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+input {
+  flex:1 1 160px;
+  padding:13px 16px;
+  font-size:1rem;
+  color:var(--text);
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:12px;
+  outline:none;
+}
+
+input:focus {
+  border-color:var(--text);
+}
+
+button {
+  flex:1 1 100%;
+  padding:13px;
+  font-size:1rem;
+  font-weight:600;
+  color:var(--bg);
+  background:var(--text);
+  border:none;
+  border-radius:999px;
+  cursor:pointer;
+}
+
+button:active {
+  transform:scale(.98);
+}
+
+.ghost {
+  background:transparent;
+  color:var(--text);
+  border:1px solid var(--line);
+}
+
+.account-card {
+  border-top:1px solid var(--line);
+  padding:28px 0;
+  margin-bottom:22px;
+}
+
+.account-meta {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.account-help {
+  color:var(--muted);
+  font-size:.88rem;
+}
+
+.account-card .form {
+  margin-top:14px;
+}
+
+.auth-actions {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  width:100%;
+}
+
+.auth-actions button {
+  flex:1 1 130px;
+}
+
+.points {
+  font-size:1.5rem;
+  font-weight:600;
+}
+
+.small {
+  display:block;
+  color:var(--muted);
+  font-size:.85rem;
+}
+
+#accountMsg,
+#msg {
+  min-height:1.4em;
+  color:var(--muted);
+}
+
+#guessForm[hidden] {
+  display:none;
+}
+
+#winnerCard {
+  background:var(--hero);
+  color:white;
+  border:none;
+  border-radius:22px;
+  padding:28px;
+  margin:26px 0;
+}
+
+#winner {
+  margin:0;
+  font-weight:600;
+}
+
+#stats,
+.total {
+  margin:0 0 12px;
+  color:var(--muted);
+}
+
+ul,ol {
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.list {
+  max-height:360px;
+  overflow-y:auto;
+}
+
+.list li {
+  padding:10px 2px;
+  border-bottom:1px solid var(--line);
+}
+
+.empty {
+  color:var(--muted);
+  font-style:italic;
+}
+
+#ergebnisse {
+  position:sticky;
+  top:90px;
+  z-index:1;
+  background:var(--bg);
+}
+
+#bestenliste {
+  position:relative;
+  z-index:2;
+  background:var(--card);
+  border-radius:28px 28px 0 0;
+  padding:36px 26px 90px;
+  margin:40px -18px 0;
+  min-height:85vh;
+  box-shadow:0 -14px 40px rgba(0,0,0,.18);
+}
+
+.typo {
+  flex:none;
+  padding:8px 12px;
+  background:none;
+  border-radius:0;
+  color:var(--muted);
+}
+
+.modal {
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.45);
+}
+
+.modal[hidden] {
+  display:none;
+}
+
+.sheet {
+  width:100%;
+  max-width:440px;
+  background:var(--card);
+  border-radius:22px;
+  padding:28px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.sheet h2 {
+  margin:0;
+}
+
+.sheet input,
+.sheet button {
+  flex:none;
+}
+
+.demo {
+  text-align:center;
+  color:var(--muted);
+  font-size:.85rem;
+  margin:26px 0 0;
+}
+
+@media(max-width:700px) {
+  .links { display:none; }
+  nav { grid-template-columns:1fr auto; }
+  .hero { padding:70px 20px 130px; }
+}
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
 </head>
+
 <body>
+
 <nav>
-<div class="logo serif">Arif-Tipp</div>
-<div class="links"><a href="#tipp">Tipp abgeben</a><a href="#ergebnisse">Ergebnisse</a><a href="#bestenliste">Bestenliste</a></div>
-<div class="right"><button id="typoBtn" class="typo" hidden>Vertippt?</button><a class="admin" href="admin.html">Admin</a></div>
+  <div class="logo serif">Arif-Tipp</div>
+
+  <div class="links">
+    <a href="#tipp">Tipp abgeben</a>
+    <a href="#ergebnisse">Ergebnisse</a>
+    <a href="#bestenliste">Bestenliste</a>
+  </div>
+
+  <div class="right">
+    <button id="typoBtn" class="typo" hidden>Vertippt?</button>
+    <span id="accountNavStatus" class="account-status">Nicht angemeldet</span>
+    <a class="admin" href="admin.html">Admin</a>
+  </div>
 </nav>
 
 <section class="hero">
-<svg class="clock" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-linecap="round" aria-hidden="true">
-<circle cx="50" cy="50" r="46" stroke-width="1.6"/>
-<g stroke-width="1.6"><path d="M50 8v6M50 86v6M8 50h6M86 50h6"/></g>
-<g stroke-width="1" opacity=".6"><path d="M71 13.6l-3 5.2M86.4 29l-5.2 3M86.4 71l-5.2-3M71 86.4l-3-5.2M29 86.4l3-5.2M13.6 71l5.2-3M13.6 29l5.2 3M29 13.6l3 5.2"/></g>
-<path id="hh" d="M50 50V28" stroke-width="3"/>
-<path id="mh" d="M50 50V17" stroke-width="2"/>
-<path id="sh" d="M50 58V13" stroke="#4ade80" stroke-width="1.2"/>
-<circle cx="50" cy="50" r="2.5" fill="#4ade80" stroke="none"/>
+
+<svg class="clock" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-linecap="round">
+  <circle cx="50" cy="50" r="46" stroke-width="1.6"/>
+  <g stroke-width="1.6">
+    <path d="M50 8v6M50 86v6M8 50h6M86 50h6"/>
+  </g>
+  <path id="hh" d="M50 50V28" stroke-width="3"/>
+  <path id="mh" d="M50 50V17" stroke-width="2"/>
+  <path id="sh" d="M50 58V13" stroke="#4ade80" stroke-width="1.2"/>
+  <circle cx="50" cy="50" r="2.5" fill="#4ade80" stroke="none"/>
 </svg>
+
 <h1 class="serif">Wie lange überzieht <br> Herr Arif?</h1>
-<p>Tippe, wie viele Sekunden Herr Arif die Stunde überzieht. Wer am nächsten dran ist, gewinnt. <br> (Bei frühem schluss gewinnt keiner)</p>
+
+<p>
+  Tippe, wie viele Sekunden Herr Arif die Stunde überzieht.
+  Wer am nächsten dran ist, gewinnt.
+  <br>(Bei frühem schluss gewinnt keiner)
+</p>
+
 <a class="pill" href="#tipp">Jetzt tippen</a>
-<svg class="wave" viewBox="0 0 1200 80" preserveAspectRatio="none"><path d="M0 80 V44 C120 14 260 58 420 36 C600 8 760 54 940 30 C1060 14 1140 34 1200 42 V80 Z" fill="var(--bg)"/></svg>
+
+<svg class="wave" viewBox="0 0 1200 80" preserveAspectRatio="none">
+  <path d="M0 80 V44 C120 14 260 58 420 36 C600 8 760 54 940 30 C1060 14 1140 34 1200 42 V80 Z" fill="var(--bg)"/>
+</svg>
+
 </section>
 
 <main>
+
+<!-- ACCOUNT -->
+
+<section class="account-card" id="account">
+
+  <div class="account-meta">
+    <div>
+      <h2 class="serif">Dein Konto</h2>
+      <p class="account-help" id="accountIntro">
+        Melde dich an oder erstelle ein Konto, um Tipps abzugeben und Punkte zu sammeln.
+      </p>
+    </div>
+
+    <div id="accountBalance" hidden>
+      <span class="small">Dein Punktestand</span>
+      <div class="points">
+        <span id="pointsValue">0</span> Punkte
+      </div>
+    </div>
+  </div>
+
+  <div id="authForm" class="form">
+    <input id="accountName"
+      placeholder="Anzeigename (nur bei Registrierung)"
+      maxlength="40"
+      autocomplete="nickname">
+
+    <input id="accountEmail"
+      type="email"
+      placeholder="E-Mail-Adresse"
+      autocomplete="email">
+
+    <input id="accountPassword"
+      type="password"
+      placeholder="Passwort"
+      autocomplete="current-password">
+
+    <div class="auth-actions">
+      <button id="signInBtn" type="button">Anmelden</button>
+      <button id="signUpBtn" type="button" class="ghost">Konto erstellen</button>
+    </div>
+  </div>
+
+  <div id="signedInPanel" hidden>
+    <p id="signedInLabel"></p>
+    <div class="auth-actions">
+      <button id="signOutBtn" type="button" class="ghost">Abmelden</button>
+    </div>
+  </div>
+
+  <p id="accountMsg" role="status" aria-live="polite"></p>
+
+</section>
+
+<!-- GUESS -->
+
 <section class="card" id="tipp">
-<h2 class="serif">Dein Tipp</h2>
-<div class="form">
-<input id="name" placeholder="Dein Name" maxlength="40" autocomplete="off">
-<input id="secs" type="number" min="0" placeholder="Tipp (Sekunden)">
-<button id="send">Abschicken</button>
-</div>
-<p id="msg"></p>
+
+  <h2 class="serif">Dein Tipp</h2>
+
+  <div class="form" id="guessForm" hidden>
+    <input id="secs"
+      type="number"
+      min="0"
+      step="1"
+      placeholder="Tipp (Sekunden)">
+
+    <button id="send">Abschicken</button>
+  </div>
+
+  <p class="account-help" id="loginToGuess">
+    Bitte melde dich oben an, um einen Tipp abzugeben.
+  </p>
+
+  <p id="msg"></p>
+
 </section>
+
 <section class="card" id="winnerCard" hidden>
-<h2 class="serif">Gewinner</h2>
-<p id="winner"></p>
+  <h2 class="serif">Gewinner</h2>
+  <p id="winner"></p>
 </section>
+
 <section class="card" id="ergebnisse">
-<h2 class="serif">Ergebnisse</h2>
-<p id="stats"></p>
-<ul id="results" class="list"></ul>
+  <h2 class="serif">Ergebnisse</h2>
+  <p id="stats"></p>
+  <ul id="results" class="list"></ul>
 </section>
+
 <section class="card" id="bestenliste">
-<h2 class="serif">Bestenliste</h2>
-<p id="total" class="total"></p>
-<ol id="leaderboard" class="list"></ol>
-<p class="demo" id="demoNote" hidden>Vorschau mit Beispieldaten</p>
+  <h2 class="serif">Bestenliste</h2>
+  <p id="total" class="total"></p>
+  <ol id="leaderboard" class="list"></ol>
+  <p class="demo" id="demoNote" hidden>Vorschau mit Beispieldaten</p>
 </section>
+
 </main>
 
+<!-- TYPO MODAL -->
+
 <div id="modal" class="modal" hidden>
-<div class="sheet">
-<h2 class="serif">Vertippt?</h2>
-<p>Falls du dich vertippt hast, kannst du hier ein Support-Ticket einführen. Ein Moderator kann dieses für dich bestätigen, wenn du ihm Bescheid sagst.</p>
-<input id="ticketName" placeholder="Dein Name (zur Identifikation)" maxlength="40" autocomplete="off">
-<button id="ticketSend">Ticket erstellen</button>
-<button id="ticketClose" class="ghost">Schließen</button>
-<p id="ticketMsg"></p>
-</div>
+  <div class="sheet">
+    <h2 class="serif">Vertippt?</h2>
+    <p>
+      Falls du dich vertippt hast, kannst du hier ein Support-Ticket
+      einführen. Ein Moderator kann dieses für dich bestätigen,
+      wenn du ihm Bescheid sagst.
+    </p>
+    <input id="ticketName" placeholder="Dein Name (zur Identifikation)" maxlength="40">
+    <button id="ticketSend">Ticket erstellen</button>
+    <button id="ticketClose" class="ghost">Schließen</button>
+    <p id="ticketMsg"></p>
+  </div>
 </div>
 
 <script>
-const DEMO = false; // true = Vorschau mit Beispieldaten
-const db = DEMO ? null : supabase.createClient("https://yxmfpoaujakkixqydgna.supabase.co", "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G");
+
+// ======================================
+// SUPABASE CONFIGURATION
+// ======================================
+
+const DEMO = false;
+
+const db = DEMO ? null : supabase.createClient(
+  "https://yxmfpoaujakkixqydgna.supabase.co",
+  "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G"
+);
+
 const TABLE = "guesses";
+
+let currentUser = null;
+let currentAccount = null;
+
+
+// ======================================
+// ACCOUNT FUNCTIONS
+// ======================================
+
+function setAccountMessage(text) {
+  document.getElementById("accountMsg").textContent = text || "";
+}
+
+function setAuthUI(user, account) {
+
+  currentUser = user || null;
+  currentAccount = account || null;
+
+  const signedIn = !!user && !!account;
+
+  document.getElementById("authForm").hidden = !!user;
+  document.getElementById("signedInPanel").hidden = !signedIn;
+  document.getElementById("accountBalance").hidden = !signedIn;
+
+  document.getElementById("guessForm").hidden = !signedIn;
+  document.getElementById("loginToGuess").hidden = signedIn;
+
+  document.getElementById("accountNavStatus").textContent =
+    signedIn ? account.name :
+    (user ? "Konto wird geladen…" : "Nicht angemeldet");
+
+  updateTypo();
+
+  if (signedIn) {
+
+    document.getElementById("signedInLabel").textContent =
+      `Angemeldet als ${account.name} (${user.email || ""})`;
+
+    document.getElementById("pointsValue").textContent =
+      Number(account.points || 0).toLocaleString("de-DE");
+
+    document.getElementById("accountIntro").textContent =
+      "Dein Konto ist aktiv. Deine Punkte werden nach Feststellung des Ergebnisses gutgeschrieben.";
+
+  } else {
+
+    document.getElementById("accountIntro").textContent =
+      "Melde dich an oder erstelle ein Konto, um Tipps abzugeben und Punkte zu sammeln.";
+
+  }
+}
+
+
+async function loadAccount(user) {
+
+  if (!user || DEMO) {
+    setAuthUI(user, null);
+    return;
+  }
+
+  const { data, error } = await db
+    .from("accounts")
+    .select("id, name, points")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    setAuthUI(user, null);
+    setAccountMessage("Kontofehler: " + error.message);
+    return;
+  }
+
+  let account = data;
+
+  if (!account) {
+
+    const suggestedName =
+      (user.user_metadata && user.user_metadata.display_name) ||
+      (user.email ? user.email.split("@")[0] : "Spieler");
+
+    const { data: created, error: insertError } = await db
+      .from("accounts")
+      .insert({
+        id: user.id,
+        name: suggestedName,
+        points: 0
+      })
+      .select("id, name, points")
+      .single();
+
+    if (insertError) {
+      setAuthUI(user, null);
+      setAccountMessage("Profil konnte nicht angelegt werden: " + insertError.message);
+      return;
+    }
+
+    account = created;
+  }
+
+  setAccountMessage("");
+  setAuthUI(user, account);
+}
+
+
+async function refreshAccount() {
+  if (currentUser) {
+    await loadAccount(currentUser);
+  }
+}
+
+
+async function signIn() {
+
+  const email = document.getElementById("accountEmail").value.trim();
+  const password = document.getElementById("accountPassword").value;
+
+  if (!email || !password) {
+    setAccountMessage("Bitte E-Mail und Passwort eingeben.");
+    return;
+  }
+
+  setAccountMessage("Anmeldung läuft…");
+
+  const { data, error } = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    setAccountMessage(error.message);
+    return;
+  }
+
+  await loadAccount(data.user);
+  setAccountMessage("Du bist angemeldet.");
+}
+
+
+async function signUp() {
+
+  const name = document.getElementById("accountName").value.trim();
+  const email = document.getElementById("accountEmail").value.trim();
+  const password = document.getElementById("accountPassword").value;
+
+  if (!name || !email || !password) {
+    setAccountMessage("Bitte Anzeigename, E-Mail und Passwort eingeben.");
+    return;
+  }
+
+  if (password.length < 8) {
+    setAccountMessage("Das Passwort muss mindestens 8 Zeichen lang sein.");
+    return;
+  }
+
+  setAccountMessage("Konto wird erstellt…");
+
+  const { data, error } = await db.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { display_name: name }
+    }
+  });
+
+  if (error) {
+    setAccountMessage(error.message);
+    return;
+  }
+
+  if (!data.session) {
+    setAccountMessage(
+      "Registrierung erfolgreich. Bitte bestätige deine E-Mail-Adresse und melde dich danach an."
+    );
+    return;
+  }
+
+  await loadAccount(data.user);
+  setAccountMessage("Dein Konto wurde erstellt.");
+}
+
+
+async function signOut() {
+
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    setAccountMessage(error.message);
+    return;
+  }
+
+  setAuthUI(null, null);
+  setAccountMessage("Du wurdest abgemeldet.");
+}
+
+
+// ======================================
+// DEMO DATA
+// ======================================
+
 const demo = {
   actual: 95,
   rounds: [185, 47, 120],
-  guesses: [{voter_name:"Lena",guess_seconds:60},{voter_name:"Kit",guess_seconds:120},{voter_name:"Jonas",guess_seconds:90},{voter_name:"Mira",guess_seconds:300},{voter_name:"Tom",guess_seconds:100}],
-  board: [{voter_name:"Sara",guess_seconds:180,actual_seconds:185,diff_seconds:5,submitted_at:"2026-11-09T08:12:00Z"},{voter_name:"Ben",guess_seconds:45,actual_seconds:47,diff_seconds:2,submitted_at:"2026-11-12T08:05:00Z"}]
+
+  guesses: [
+    { voter_name:"Lena", guess_seconds:60 },
+    { voter_name:"Kit", guess_seconds:120 },
+    { voter_name:"Jonas", guess_seconds:90 },
+    { voter_name:"Mira", guess_seconds:300 },
+    { voter_name:"Tom", guess_seconds:100 }
+  ],
+
+  board: [
+    {
+      voter_name:"Sara",
+      guess_seconds:180,
+      actual_seconds:185,
+      diff_seconds:5,
+      submitted_at:"2026-11-09T08:12:00Z"
+    },
+    {
+      voter_name:"Ben",
+      guess_seconds:45,
+      actual_seconds:47,
+      diff_seconds:2,
+      submitted_at:"2026-11-12T08:05:00Z"
+    }
+  ]
 };
-if (DEMO) document.getElementById("demoNote").hidden = false;
+
+if (DEMO) {
+  document.getElementById("demoNote").hidden = false;
+}
+
+
+// ======================================
+// LOCAL STORAGE
+// ======================================
+
+const ls = {
+
+  get(k) {
+    try {
+      return localStorage.getItem(k);
+    } catch (e) {
+      return null;
+    }
+  },
+
+  set(k, v) {
+    try {
+      localStorage.setItem(k, v);
+    } catch (e) {}
+  },
+
+  del(k) {
+    try {
+      localStorage.removeItem(k);
+    } catch (e) {}
+  }
+
+};
+
+
+// ======================================
+// VOTING
+// ======================================
 
 document.getElementById("send").onclick = async () => {
-  const voter_name = document.getElementById("name").value.trim();
-  const guess_seconds = parseInt(document.getElementById("secs").value, 10);
+
+  const guess_seconds = parseInt(
+    document.getElementById("secs").value,
+    10
+  );
+
   const msg = document.getElementById("msg");
-  if (!voter_name || isNaN(guess_seconds)) { msg.textContent = "Bitte gib einen Namen und eine Zahl ein."; return; }
-  if (ls.get("voted")) { msg.textContent = "Du hast auf diesem Gerät schon getippt."; updateTypo(); return; }
-  if (DEMO) { demo.guesses.push({voter_name, guess_seconds}); ls.set("voted", "1"); updateTypo(); msg.textContent = "Danke fürs Abstimmen!"; loadResults(); return; }
-  const { error } = await db.from(TABLE).insert({ voter_name, guess_seconds });
-  if (error) {
-    msg.textContent = error.message.includes("row-level security") ? "Die Abstimmung ist geschlossen (ein Ergebnis wurde festgelegt)." : "Fehler: " + error.message;
+
+  if (!currentUser || !currentAccount) {
+    msg.textContent = "Bitte melde dich zuerst an.";
     return;
   }
-  ls.set("voted", "1");
+
+  if (!Number.isInteger(guess_seconds) || guess_seconds < 0) {
+    msg.textContent = "Bitte gib eine gültige positive Sekundenzahl ein.";
+    return;
+  }
+
+  const voteKey = "voted_" + currentUser.id;
+
+  if (ls.get(voteKey)) {
+    msg.textContent = "Du hast in dieser Runde bereits getippt.";
+    updateTypo();
+    return;
+  }
+
+  const voter_name = currentAccount.name;
+
+  if (DEMO) {
+    demo.guesses.push({ voter_name, guess_seconds });
+    ls.set(voteKey, "1");
+    updateTypo();
+    msg.textContent = "Danke fürs Abstimmen!";
+    loadResults();
+    return;
+  }
+
+  const { error } = await db
+    .from(TABLE)
+    .insert({
+      voter_name,
+      guess_seconds,
+      account_id: currentUser.id
+    });
+
+  if (error) {
+    msg.textContent =
+      error.message.includes("row-level security")
+        ? "Die Abstimmung ist geschlossen (ein Ergebnis wurde festgelegt)."
+        : "Fehler: " + error.message;
+    return;
+  }
+
+  ls.set(voteKey, "1");
   updateTypo();
+
   msg.textContent = "Danke fürs Abstimmen!";
+
   loadResults();
 };
 
-const ls = {
-  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
-  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
-};
-function updateTypo() { document.getElementById("typoBtn").hidden = !ls.get("voted"); }
+
+// ======================================
+// TYPO TICKET
+// ======================================
+
+function updateTypo() {
+  document.getElementById("typoBtn").hidden =
+    !(currentUser && ls.get("voted_" + currentUser.id));
+}
+
 function releaseDevice() {
-  ls.del("voted"); ls.del("ticketToken"); updateTypo();
-  document.getElementById("msg").textContent = "Dein Ticket wurde bestätigt. Du kannst erneut tippen.";
-}
-async function checkTicket() {
-  const tok = ls.get("ticketToken");
-  if (!tok || DEMO) return;
-  const { data } = await db.rpc("claim_ticket", { p_token: tok });
-  if (data === "approved") releaseDevice();
-}
-const modal = document.getElementById("modal");
-document.getElementById("typoBtn").onclick = () => { modal.hidden = false; };
-document.getElementById("ticketClose").onclick = () => { modal.hidden = true; };
-modal.onclick = e => { if (e.target === modal) modal.hidden = true; };
-document.getElementById("ticketSend").onclick = async () => {
-  const name = document.getElementById("ticketName").value.trim();
-  const tm = document.getElementById("ticketMsg");
-  if (!name) { tm.textContent = "Bitte gib deinen Namen an."; return; }
-  if (ls.get("ticketToken")) { tm.textContent = "Du hast bereits ein Ticket erstellt."; return; }
-  const token = crypto.randomUUID();
-  if (DEMO) setTimeout(releaseDevice, 6000);
-  else {
-    const { error } = await db.rpc("create_ticket", { p_token: token, p_name: name });
-    if (error) { tm.textContent = "Fehler: " + error.message; return; }
+
+  if (currentUser) {
+    ls.del("voted_" + currentUser.id);
   }
+
+  ls.del("ticketToken");
+  updateTypo();
+
+  document.getElementById("msg").textContent =
+    "Dein Ticket wurde bestätigt. Du kannst erneut tippen.";
+}
+
+async function checkTicket() {
+
+  const tok = ls.get("ticketToken");
+
+  if (!tok || DEMO) return;
+
+  const { data } = await db.rpc("claim_ticket", {
+    p_token: tok
+  });
+
+  if (data === "approved") {
+    releaseDevice();
+  }
+}
+
+const modal = document.getElementById("modal");
+
+document.getElementById("typoBtn").onclick = () => {
+  modal.hidden = false;
+};
+
+document.getElementById("ticketClose").onclick = () => {
+  modal.hidden = true;
+};
+
+modal.onclick = e => {
+  if (e.target === modal) {
+    modal.hidden = true;
+  }
+};
+
+document.getElementById("ticketSend").onclick = async () => {
+
+  const name =
+    document.getElementById("ticketName").value.trim() ||
+    (currentAccount && currentAccount.name) ||
+    "";
+
+  const tm = document.getElementById("ticketMsg");
+
+  if (!name) {
+    tm.textContent = "Bitte gib deinen Namen an.";
+    return;
+  }
+
+  if (!currentUser) {
+    tm.textContent = "Bitte melde dich zuerst an.";
+    return;
+  }
+
+  if (ls.get("ticketToken")) {
+    tm.textContent = "Du hast bereits ein Ticket erstellt.";
+    return;
+  }
+
+  const token = crypto.randomUUID();
+
+  if (DEMO) {
+    setTimeout(releaseDevice, 6000);
+  } else {
+
+    const { error } = await db.rpc("create_ticket", {
+      p_token: token,
+      p_name: name
+    });
+
+    if (error) {
+      tm.textContent = "Fehler: " + error.message;
+      return;
+    }
+  }
+
   ls.set("ticketToken", token);
+
   tm.textContent = "Ticket erstellt. Sag einem Moderator Bescheid.";
 };
 
+
+// ======================================
+// DISPLAY HELPERS
+// ======================================
+
 function fmt(s) {
-  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
-  return [h ? `${h} Std` : "", (h || m) ? `${m} Min` : "", `${sec} s`].filter(Boolean).join(" ");
-}
-function addItem(list, text, sub) {
-  const li = document.createElement("li");
-  li.textContent = text;
-  if (sub) { const s = document.createElement("span"); s.className = "small"; s.textContent = sub; li.appendChild(s); }
-  list.appendChild(li);
-}
-function addEmpty(list, text) {
-  const li = document.createElement("li"); li.className = "empty"; li.textContent = text; list.appendChild(li);
+
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+
+  return [
+    h ? `${h} Std` : "",
+    (h || m) ? `${m} Min` : "",
+    `${sec} s`
+  ].filter(Boolean).join(" ");
 }
 
+
+function addItem(list, text, sub) {
+
+  const li = document.createElement("li");
+  li.textContent = text;
+
+  if (sub) {
+    const s = document.createElement("span");
+    s.className = "small";
+    s.textContent = sub;
+    li.appendChild(s);
+  }
+
+  list.appendChild(li);
+}
+
+
+function addEmpty(list, text) {
+
+  const li = document.createElement("li");
+  li.className = "empty";
+  li.textContent = text;
+
+  list.appendChild(li);
+}
+
+
+// ======================================
+// RESULTS
+// ======================================
+
 async function loadResults() {
+
   const msg = document.getElementById("msg");
+
   let data, actual;
+
   if (DEMO) {
-    data = [...demo.guesses].sort((a, b) => a.guess_seconds - b.guess_seconds);
+
+    data = [...demo.guesses].sort(
+      (a, b) => a.guess_seconds - b.guess_seconds
+    );
+
     actual = demo.actual;
+
   } else {
+
     const [g, r] = await Promise.all([
-      db.from(TABLE).select("voter_name, guess_seconds").order("guess_seconds"),
-      db.from("game_result").select("actual_seconds").maybeSingle()
+
+      db.from(TABLE)
+        .select("voter_name, guess_seconds")
+        .order("guess_seconds"),
+
+      db.from("game_result")
+        .select("actual_seconds")
+        .maybeSingle()
+
     ]);
-    if (g.error) { msg.textContent = "Ladefehler: " + g.error.message; return; }
+
+    if (g.error) {
+      msg.textContent = "Ladefehler: " + g.error.message;
+      return;
+    }
+
     data = g.data;
     actual = r.data ? r.data.actual_seconds : null;
   }
-  const list = document.getElementById("results");
-  list.innerHTML = "";
-  if (!data.length) addEmpty(list, "Noch keine Tipps.");
-  data.forEach(x => addItem(list, `${x.voter_name}: ${x.guess_seconds} s`));
-  const avg = data.length ? Math.round(data.reduce((s, x) => s + x.guess_seconds, 0) / data.length) : 0;
-  document.getElementById("stats").textContent = `${data.length} Tipps, Durchschnitt ${avg} s`;
 
-  const card = document.getElementById("winnerCard"), winner = document.getElementById("winner");
-  if (actual === null || !data.length) { card.hidden = true; winner.textContent = ""; return; }
-  const best = Math.min(...data.map(x => Math.abs(x.guess_seconds - actual)));
-  const winners = data.filter(x => Math.abs(x.guess_seconds - actual) === best);
+  const list = document.getElementById("results");
+
+  list.innerHTML = "";
+
+  if (!data.length) {
+    addEmpty(list, "Noch keine Tipps.");
+  }
+
+  data.forEach(x => {
+    addItem(list, `${x.voter_name}: ${x.guess_seconds} s`);
+  });
+
+  const avg = data.length
+    ? Math.round(
+        data.reduce((s, x) => s + x.guess_seconds, 0) / data.length
+      )
+    : 0;
+
+  document.getElementById("stats").textContent =
+    `${data.length} Tipps, Durchschnitt ${avg} s`;
+
+  const card = document.getElementById("winnerCard");
+  const winner = document.getElementById("winner");
+
+  if (actual === null || !data.length) {
+    card.hidden = true;
+    winner.textContent = "";
+    return;
+  }
+
+  const best = Math.min(
+    ...data.map(x => Math.abs(x.guess_seconds - actual))
+  );
+
+  const winners = data.filter(
+    x => Math.abs(x.guess_seconds - actual) === best
+  );
+
   card.hidden = false;
-  winner.textContent = `Echte Zeit: ${actual} s. ` + (winners.length > 1 ? "Gewinner (Gleichstand): " : "Gewinner: ") +
-    winners.map(x => `${x.voter_name} (${x.guess_seconds} s, ${best} s daneben)`).join(", ");
+
+  winner.textContent =
+    `Echte Zeit: ${actual} s. ` +
+    (winners.length > 1 ? "Gewinner (Gleichstand): " : "Gewinner: ") +
+    winners.map(
+      x => `${x.voter_name} (${x.guess_seconds} s, ${best} s daneben)`
+    ).join(", ");
 }
+
+
+// ======================================
+// LEADERBOARD
+// ======================================
 
 async function loadLeaderboard() {
+
   let data;
-  if (DEMO) data = demo.board;
-  else {
-    const r = await db.from("leaderboard").select("voter_name, guess_seconds, actual_seconds, diff_seconds, submitted_at").order("declared_at", { ascending: true });
+
+  if (DEMO) {
+
+    data = demo.board;
+
+  } else {
+
+    const r = await db
+      .from("leaderboard")
+      .select("voter_name, guess_seconds, actual_seconds, diff_seconds, submitted_at")
+      .order("declared_at", { ascending:true });
+
     if (r.error) return;
+
     data = r.data;
   }
+
   const list = document.getElementById("leaderboard");
+
   list.innerHTML = "";
-  if (!data.length) addEmpty(list, "Noch keine Gewinner.");
+
+  if (!data.length) {
+    addEmpty(list, "Noch keine Gewinner.");
+  }
 
   let secs;
-  if (DEMO) secs = demo.rounds;
-  else {
-    const t = await db.from("rounds").select("seconds");
+
+  if (DEMO) {
+
+    secs = demo.rounds;
+
+  } else {
+
+    const t = await db
+      .from("rounds")
+      .select("seconds");
+
     secs = t.error ? [] : t.data.map(x => x.seconds);
   }
+
   const total = secs.reduce((s, v) => s + v, 0);
-  document.getElementById("total").textContent = secs.length
-    ? `Gesamte Überziehzeit: ${fmt(total)} (${secs.length} ${secs.length === 1 ? "Runde" : "Runden"})`
-    : "";
 
-  data.forEach(x => addItem(list,
-    `${x.voter_name}: Tipp ${x.guess_seconds} s, echte Zeit ${x.actual_seconds} s (${x.diff_seconds} s daneben)`,
-    `Abgegeben am ${new Date(x.submitted_at).toLocaleDateString("de-DE")}`));
+  document.getElementById("total").textContent =
+    secs.length
+      ? `Gesamte Überziehzeit: ${fmt(total)} (${secs.length} ${secs.length === 1 ? "Runde" : "Runden"})`
+      : "";
+
+  data.forEach(x => {
+
+    addItem(
+      list,
+      `${x.voter_name}: Tipp ${x.guess_seconds} s, echte Zeit ${x.actual_seconds} s (${x.diff_seconds} s daneben)`,
+      `Abgegeben am ${new Date(x.submitted_at).toLocaleDateString("de-DE")}`
+    );
+
+  });
 }
 
-function setHand(id, a) { document.getElementById(id).setAttribute("transform", `rotate(${a} 50 50)`); }
+
+// ======================================
+// CLOCK
+// ======================================
+
+function setHand(id, a) {
+  document.getElementById(id).setAttribute(
+    "transform",
+    `rotate(${a} 50 50)`
+  );
+}
+
 function tick() {
-  const d = new Date(), s = d.getSeconds(), m = d.getMinutes() + s / 60, h = (d.getHours() % 12) + m / 60;
-  setHand("hh", h * 30); setHand("mh", m * 6); setHand("sh", s * 6);
+
+  const d = new Date();
+
+  const s = d.getSeconds();
+  const m = d.getMinutes() + s / 60;
+  const h = (d.getHours() % 12) + m / 60;
+
+  setHand("hh", h * 30);
+  setHand("mh", m * 6);
+  setHand("sh", s * 6);
 }
+
 tick();
 setInterval(tick, 1000);
+
+
+// ======================================
+// INITIALIZATION
+// ======================================
+
+document.getElementById("signInBtn").onclick = signIn;
+document.getElementById("signUpBtn").onclick = signUp;
+document.getElementById("signOutBtn").onclick = signOut;
+
+if (DEMO) {
+
+  setAuthUI(
+    { id:"demo-user", email:"demo@example.com" },
+    { id:"demo-user", name:"Demo-Spieler", points:125 }
+  );
+
+} else {
+
+  db.auth.getSession().then(({ data }) => {
+    loadAccount(data.session ? data.session.user : null);
+  });
+
+  db.auth.onAuthStateChange((_event, session) => {
+
+    Promise.resolve().then(() => {
+      loadAccount(session ? session.user : null);
+    });
+
+  });
+}
 
 updateTypo();
 loadResults();
 loadLeaderboard();
 checkTicket();
-setInterval(() => { loadResults(); loadLeaderboard(); checkTicket(); }, 5000);
+
+setInterval(() => {
+  loadResults();
+  loadLeaderboard();
+  checkTicket();
+  refreshAccount();
+}, 5000);
+
 </script>
 </body>
 </html>
