@@ -227,6 +227,7 @@ const ls = {
 function validEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
 function setAccountMessage(text) {
   document.getElementById("accountMsg").textContent = text || "";
 }
@@ -366,7 +367,7 @@ async function signUp() {
   if (data.session) {
     await loadAccount(data.user);
   } else {
-    setAccountMessage("Konto erstellt. Bitte bestätige deine E-Mail-Adresse über den Link in deinem Postfach.");
+    setAccountMessage("Konto erstellt. Falls du dich nicht direkt anmelden kannst, prüfe, ob „Confirm email“ in Supabase deaktiviert ist.");
   }
 }
 
