@@ -141,7 +141,7 @@ padding:28px;display:flex;flex-direction:column;gap:12px}
 
   <div id="authForm" class="form">
     <input id="accountName" placeholder="Anzeigename (bei Registrierung)" maxlength="40">
-    <input id="accountUsername" placeholder="Benutzername" autocomplete="username" minlength="3" maxlength="24">
+    <input id="accountEmail" type="email" placeholder="E-Mail-Adresse" autocomplete="email" required>
     <input id="accountPassword" type="password" placeholder="Passwort" autocomplete="current-password">
     <div class="auth-actions">
       <button id="signInBtn" type="button">Anmelden</button>
@@ -205,7 +205,6 @@ const SUPABASE_KEY = "sb_publishable_l8UspBwusWxFnWo1WbbIWg_ddXL312G";
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const TABLE = "guesses";
-const AUTH_DOMAIN = "accounts.arif-tipp.invalid";
 
 let currentUser = null;
 let currentAccount = null;
@@ -225,12 +224,8 @@ const ls = {
   }
 };
 
-function usernameToAuthEmail(username) {
-  return username.toLowerCase() + "@" + AUTH_DOMAIN;
-}
-
-function validUsername(username) {
-  return /^[a-zA-Z0-9._-]{3,24}$/.test(username);
+function validEmail(email) {
+  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
 }
 
 function setAccountMessage(text) {
@@ -288,8 +283,7 @@ async function loadAccount(user) {
   let account = data;
 
   if (!account) {
-    const username = user.user_metadata?.username || "Spieler";
-    const displayName = user.user_metadata?.display_name || username;
+    const displayName = user.user_metadata?.display_name || user.email || "Spieler";
 
     const result = await db.from("accounts")
       .insert({
@@ -314,16 +308,16 @@ async function loadAccount(user) {
 }
 
 async function signIn() {
-  const username = document.getElementById("accountUsername").value.trim();
+  const email = document.getElementById("accountEmail").value.trim();
   const password = document.getElementById("accountPassword").value;
 
-  if (!validUsername(username) || !password) {
-    setAccountMessage("Bitte gültigen Benutzernamen und Passwort eingeben.");
+  if (!validEmail(email) || !password) {
+    setAccountMessage("Bitte gültige E-Mail-Adresse und Passwort eingeben.");
     return;
   }
 
   const {data,error} = await db.auth.signInWithPassword({
-    email:usernameToAuthEmail(username),
+    email,
     password
   });
 
@@ -336,12 +330,17 @@ async function signIn() {
 }
 
 async function signUp() {
-  const username = document.getElementById("accountUsername").value.trim();
-  const displayName = document.getElementById("accountName").value.trim() || username;
+  const email = document.getElementById("accountEmail").value.trim();
+  const displayName = document.getElementById("accountName").value.trim();
   const password = document.getElementById("accountPassword").value;
 
-  if (!validUsername(username)) {
-    setAccountMessage("Benutzername: 3–24 Zeichen, Buchstaben, Zahlen, Punkt, _ oder -.");
+  if (!validEmail(email)) {
+    setAccountMessage("Bitte gib eine gültige E-Mail-Adresse ein.");
+    return;
+  }
+
+  if (!displayName) {
+    setAccountMessage("Bitte gib einen Anzeigenamen ein.");
     return;
   }
 
@@ -351,11 +350,10 @@ async function signUp() {
   }
 
   const {data,error} = await db.auth.signUp({
-    email:usernameToAuthEmail(username),
+    email,
     password,
     options:{
       data:{
-        username:username,
         display_name:displayName
       }
     }
@@ -369,7 +367,7 @@ async function signUp() {
   if (data.session) {
     await loadAccount(data.user);
   } else {
-    setAccountMessage("Konto erstellt. Deaktiviere in Supabase die E-Mail-Bestätigung, damit du dich ohne E-Mail-Link anmelden kannst.");
+    setAccountMessage("Konto erstellt. Bitte bestätige deine E-Mail-Adresse über den Link in deinem Postfach.");
   }
 }
 
