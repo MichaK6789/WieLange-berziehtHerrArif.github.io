@@ -235,10 +235,33 @@ function setAccountMessage(text) {
   document.getElementById("accountMsg").textContent = text || "";
 }
 
-function updateTypo() {
-  const btn = document.getElementById("typoBtn");
-  if (!btn) return;
-  btn.hidden = false;
+async function updateTypo() {
+  const typoButton = document.getElementById("typoButton");
+
+  if (!typoButton) return;
+
+  // Ohne Anmeldung keine Ticket-Anfrage
+  if (!currentUser) {
+    typoButton.style.display = "none";
+    return;
+  }
+
+  // Prüfen, ob der Nutzer bereits einen Tipp abgegeben hat
+  const { data, error } = await db
+    .from("guesses")
+    .select("id")
+    .eq("account_id", currentUser.id)
+    .limit(1);
+
+  if (error) {
+    console.error("Fehler beim Prüfen des Tipps:", error);
+    typoButton.style.display = "none";
+    return;
+  }
+
+  // Nur anzeigen, wenn noch kein Tipp vorhanden ist
+  typoButton.style.display =
+    data && data.length > 0 ? "none" : "inline-block";
 }
 
 function setAuthUI(user, account) {
