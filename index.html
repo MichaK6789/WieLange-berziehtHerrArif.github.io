@@ -463,29 +463,32 @@ document.getElementById("send").onclick = submitGuess;
 // SUPPORT TICKETS
 // ========================================
 
-async function releaseDevice() {
-  ls.del("voted");
-  ls.del("ticketToken");
-
-  updateTypo();
-
-  document.getElementById("msg").textContent =
-    "Dein Ticket wurde bestätigt. Du kannst erneut tippen.";
-
-  await loadResults();
-  await loadLeaderboard();
-}
+// ========================================
+// SUPPORT TICKETS
+// ========================================
 
 async function checkTicket() {
   const token = ls.get("ticketToken");
+
   if (!token || !currentUser) return;
 
-  const {data,error} = await db.rpc("claim_ticket", {
-    p_token:token
+  const { data, error } = await db.rpc("claim_ticket", {
+    p_token: token
   });
 
-  if (!error && data === "approved") {
-    releaseDevice();
+  if (error) {
+    console.error("Ticket-Prüfung fehlgeschlagen:", error.message);
+    return;
+  }
+
+  if (data === "approved") {
+    ls.del("ticketToken");
+
+    document.getElementById("msg").textContent =
+      "Dein Ticket wurde bestätigt. Du kannst erneut tippen.";
+
+    await loadResults();
+    await loadLeaderboard();
   }
 }
 
@@ -506,30 +509,47 @@ modal.onclick = event => {
 document.getElementById("ticketSend").onclick = async () => {
   const name = document.getElementById("ticketName").value.trim();
   const message = document.getElementById("ticketMsg");
+  const sendButton = document.getElementById("ticketSend");
+
+  if (!currentUser) {
+    message.textContent = "Bitte melde dich zuerst an.";
+    return;
+  }
 
   if (!name) {
     message.textContent = "Bitte gib deinen Namen an.";
     return;
   }
 
-  ls.del("ticketToken");
-
-  const token = crypto.randomUUID();
-
-  const {error} = await db.rpc("create_ticket", {
-    p_token:token,
-    p_name:name
-  });
-
-  if (error) {
-    message.textContent = "Fehler: " + error.message;
+  if (ls.get("ticketToken")) {
+    message.textContent = "Du hast bereits ein Ticket erstellt.";
     return;
   }
 
-  ls.set("ticketToken",token);
-  message.textContent = "Ticket erstellt. Sag einem Moderator Bescheid.";
-};
+  sendButton.disabled = true;
 
+  try {
+    const token = crypto.randomUUID();
+
+    const { error } = await db.rpc("create_ticket", {
+      p_token: token,
+      p_name: name
+    });
+
+    if (error) {
+      message.textContent = "Fehler: " + error.message;
+      return;
+    }
+
+    ls.set("ticketToken", token);
+
+    message.textContent =
+      "Ticket erstellt. Sag einem Moderator Bescheid.";
+
+  } finally {
+    sendButton.disabled = false;
+  }
+};
 
 // ========================================
 // FORMATTING AND RESULTS
