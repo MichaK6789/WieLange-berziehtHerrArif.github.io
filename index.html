@@ -224,18 +224,8 @@ const ls = {
   }
 };
 
-function
- 
-validEmail
-(
-email
-) 
-{
-  
-return
- 
-/^[^\s@]+@[^\s@]+\.[^\s@]+$/
-.test(email);
+function validEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 function setAccountMessage(text) {
   document.getElementById("accountMsg").textContent = text || "";
