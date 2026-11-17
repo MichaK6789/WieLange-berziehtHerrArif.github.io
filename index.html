@@ -7,6 +7,7 @@
 <title>Wie lange überzieht Herr Arif?</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+
 <style>
 :root {
   --bg:#f3f2ee; --card:#fbfaf7; --text:#1d1d22;
@@ -90,6 +91,7 @@ padding:28px;display:flex;flex-direction:column;gap:12px}
 }
 </style>
 </head>
+
 <body>
 
 <nav>
@@ -233,7 +235,7 @@ function setAccountMessage(text) {
 }
 
 function updateTypo() {
-  document.getElementById("typoBtn").hidden = !ls.get("voted");
+  document.getElementById("typoBtn").hidden = true;
 }
 
 function setAuthUI(user, account) {
@@ -387,9 +389,15 @@ document.getElementById("signInBtn").onclick = signIn;
 document.getElementById("signUpBtn").onclick = signUp;
 document.getElementById("signOutBtn").onclick = signOut;
 
+
+// ========================================
+// SUBMIT GUESS - CHECK SUPABASE
+// ========================================
+
 async function submitGuess() {
   const seconds = Number(document.getElementById("secs").value);
   const msg = document.getElementById("msg");
+  const sendButton = document.getElementById("send");
 
   if (!currentUser || !currentAccount) {
     msg.textContent = "Bitte melde dich zuerst an.";
@@ -401,33 +409,57 @@ async function submitGuess() {
     return;
   }
 
-  if (ls.get("voted")) {
-    msg.textContent = "Du hast auf diesem Gerät bereits getippt.";
-    return;
+  sendButton.disabled = true;
+
+  try {
+    // Check whether this account already has a vote
+    const { data: existingVote, error: checkError } = await db
+      .from(TABLE)
+      .select("id")
+      .eq("account_id", currentUser.id)
+      .maybeSingle();
+
+    if (checkError) {
+      msg.textContent = "Fehler beim Prüfen: " + checkError.message;
+      return;
+    }
+
+    if (existingVote) {
+      msg.textContent = "Du hast bereits einen Tipp abgegeben.";
+      return;
+    }
+
+    const { error } = await db.from(TABLE).insert({
+      voter_name: currentAccount.name,
+      guess_seconds: seconds,
+      account_id: currentUser.id
+    });
+
+    if (error) {
+      msg.textContent = "Fehler: " + error.message;
+      return;
+    }
+
+    // Remove the old browser flag
+    ls.del("voted");
+    updateTypo();
+
+    msg.textContent = "Danke fürs Abstimmen!";
+    document.getElementById("secs").value = "";
+
+    await loadResults();
+
+  } finally {
+    sendButton.disabled = false;
   }
-
-  const {error} = await db.from(TABLE).insert({
-    voter_name:currentAccount.name,
-    guess_seconds:seconds,
-    account_id:currentUser.id
-  });
-
-  if (error) {
-    msg.textContent = error.message.includes("row-level security")
-      ? "Die Abstimmung ist geschlossen oder nicht erlaubt."
-      : "Fehler: " + error.message;
-    return;
-  }
-
-  ls.set("voted","1");
-  updateTypo();
-  msg.textContent = "Danke fürs Abstimmen!";
-  document.getElementById("secs").value = "";
-
-  await loadResults();
 }
 
 document.getElementById("send").onclick = submitGuess;
+
+
+// ========================================
+// SUPPORT TICKETS
+// ========================================
 
 function releaseDevice() {
   ls.del("voted");
@@ -493,6 +525,11 @@ document.getElementById("ticketSend").onclick = async () => {
   ls.set("ticketToken",token);
   message.textContent = "Ticket erstellt. Sag einem Moderator Bescheid.";
 };
+
+
+// ========================================
+// FORMATTING AND RESULTS
+// ========================================
 
 function fmt(seconds) {
   const h = Math.floor(seconds/3600);
@@ -618,6 +655,11 @@ async function loadLeaderboard() {
       : "";
 }
 
+
+// ========================================
+// CLOCK
+// ========================================
+
 function setHand(id,angle) {
   document.getElementById(id).setAttribute(
     "transform",
@@ -639,6 +681,11 @@ function tick() {
 tick();
 setInterval(tick,1000);
 
+
+// ========================================
+// AUTH INITIALIZATION
+// ========================================
+
 updateTypo();
 
 db.auth.getSession().then(({data}) => {
@@ -659,6 +706,7 @@ setInterval(() => {
   loadLeaderboard();
   checkTicket();
 },15000);
+
 </script>
 </body>
 </html>
