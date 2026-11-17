@@ -463,12 +463,17 @@ document.getElementById("send").onclick = submitGuess;
 // SUPPORT TICKETS
 // ========================================
 
-function releaseDevice() {
+async function releaseDevice() {
   ls.del("voted");
   ls.del("ticketToken");
+
   updateTypo();
+
   document.getElementById("msg").textContent =
     "Dein Ticket wurde bestätigt. Du kannst erneut tippen.";
+
+  await loadResults();
+  await loadLeaderboard();
 }
 
 async function checkTicket() {
