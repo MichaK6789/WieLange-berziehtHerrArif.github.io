@@ -507,10 +507,7 @@ document.getElementById("ticketSend").onclick = async () => {
     return;
   }
 
-  if (ls.get("ticketToken")) {
-    message.textContent = "Du hast bereits ein Ticket erstellt.";
-    return;
-  }
+  ls.del("ticketToken");
 
   const token = crypto.randomUUID();
 
