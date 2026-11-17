@@ -56,6 +56,7 @@ input:focus{border-color:var(--text)}
 button{padding:13px;font-size:1rem;font-weight:600;color:var(--bg);
 background:var(--text);border:0;border-radius:999px;cursor:pointer}
 button:active{transform:scale(.98)}
+button:disabled{opacity:.5;cursor:not-allowed}
 .form>button{flex:1 1 100%}
 .auth-actions{display:flex;flex-wrap:wrap;gap:10px;width:100%}
 .auth-actions button{flex:1 1 130px}
@@ -393,7 +394,7 @@ document.getElementById("signOutBtn").onclick = signOut;
 
 
 // ========================================
-// SUBMIT GUESS - CHECK SUPABASE
+// SUBMIT GUESS
 // ========================================
 
 async function submitGuess() {
@@ -414,19 +415,18 @@ async function submitGuess() {
   sendButton.disabled = true;
 
   try {
-    // Check whether this account already has a vote
     const { data: existingVote, error: checkError } = await db
       .from(TABLE)
       .select("id")
       .eq("account_id", currentUser.id)
-      .maybeSingle();
+      .limit(1);
 
     if (checkError) {
       msg.textContent = "Fehler beim Prüfen: " + checkError.message;
       return;
     }
 
-    if (existingVote) {
+    if (existingVote && existingVote.length > 0) {
       msg.textContent = "Du hast bereits einen Tipp abgegeben.";
       return;
     }
@@ -442,7 +442,6 @@ async function submitGuess() {
       return;
     }
 
-    // Remove the old browser flag
     ls.del("voted");
     updateTypo();
 
@@ -458,10 +457,6 @@ async function submitGuess() {
 
 document.getElementById("send").onclick = submitGuess;
 
-
-// ========================================
-// SUPPORT TICKETS
-// ========================================
 
 // ========================================
 // SUPPORT TICKETS
@@ -550,6 +545,7 @@ document.getElementById("ticketSend").onclick = async () => {
     sendButton.disabled = false;
   }
 };
+
 
 // ========================================
 // FORMATTING AND RESULTS
@@ -644,35 +640,57 @@ async function loadResults() {
     winners.map(x=>x.voter_name+" ("+x.guess_seconds+" s, "+best+" s daneben)").join(", ");
 }
 
-async function loadLeaderboard() {
-  const r = await db.from("leaderboard")
-    .select("voter_name,guess_seconds,actual_seconds,diff_seconds,submitted_at")
-    .order("declared_at",{ascending:true});
 
+// ========================================
+// LEADERBOARD - GESAMTPUNKTE
+// ========================================
+
+async function loadLeaderboard() {
   const list = document.getElementById("leaderboard");
+  const totalText = document.getElementById("total");
+
+  const { data, error } = await db
+    .from("accounts")
+    .select("name, points")
+    .order("points", { ascending: false });
+
   list.replaceChildren();
 
-  if (r.error) {
-    addEmpty(list,"Bestenliste konnte nicht geladen werden.");
+  if (error) {
+    addEmpty(list, "Bestenliste konnte nicht geladen werden: " + error.message);
     return;
   }
 
-  if (!r.data.length) addEmpty(list,"Noch keine Gewinner.");
+  if (!data || data.length === 0) {
+    addEmpty(list, "Noch keine Spieler vorhanden.");
+  } else {
+    data.forEach((user, index) => {
+      const points = Number(user.points || 0);
 
-  r.data.forEach(x => {
-    addItem(
-      list,
-      x.voter_name + ": Tipp " + x.guess_seconds +
-      " s, echte Zeit " + x.actual_seconds +
-      " s (" + x.diff_seconds + " s daneben)",
-      "Abgegeben am " + new Date(x.submitted_at).toLocaleDateString("de-DE")
-    );
-  });
+      addItem(
+        list,
+        (index + 1) + ". " + user.name + " – " +
+        points.toLocaleString("de-DE") + " Punkte"
+      );
+    });
+  }
 
-  const rounds = await db.from("rounds").select("seconds");
-  const total = (rounds.data || []).reduce((sum,x)=>sum+x.seconds,0);
+  // Gesamte Überziehzeit und Rundenzahl weiterhin anzeigen
+  const rounds = await db
+    .from("rounds")
+    .select("seconds");
 
-  document.getElementById("total").textContent =
+  if (rounds.error) {
+    totalText.textContent = "Gesamte Überziehzeit konnte nicht geladen werden.";
+    console.error("Fehler beim Laden der Runden:", rounds.error);
+    return;
+  }
+
+  const total = (rounds.data || []).reduce(
+    (sum, x) => sum + Number(x.seconds || 0), 0
+  );
+
+  totalText.textContent =
     rounds.data?.length
       ? "Gesamte Überziehzeit: " + fmt(total) +
         " (" + rounds.data.length + " Runden)"
